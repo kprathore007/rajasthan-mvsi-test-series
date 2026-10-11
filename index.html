@@ -249,3 +249,1173 @@ canvas { display:block; width:100%; max-width:100%; }
     </div>
   </section>
 </main>
+<footer>Rajasthan MVSI Test Series | Progress is stored locally in this browser.</footer>
+
+<script>
+"use strict";
+
+// Keep the existing key to reuse saved mocks from earlier versions.
+const STORAGE_KEY = "mvsiMockSeriesV3";
+let mocks = [];
+let activeMockId = null;
+let activeQuestions = [];
+let activeAnswers = {};
+let activeMode = "full";
+let currentIndex = 0;
+let remainingSeconds = 0;
+let timerInterval = null;
+let lastResult = null;
+
+function makeId() {
+  return "id_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, function (ch) {
+    return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[ch];
+  });
+}
+
+function getQuestionText(q) {
+  return q.question_en || q.question || q.questionText || q.question_text ||
+    q.text || q.question_hi || q.Question || "";
+}
+
+function getOptions(q) {
+  const raw = q.options || q.choices || q.answers;
+
+  if (Array.isArray(raw)) {
+    const labels = ["A", "B", "C", "D", "E", "F"];
+    const options = {};
+    raw.forEach(function (item, i) {
+      options[labels[i] || String(i + 1)] =
+        (item && typeof item === "object")
+          ? (item.text || item.value || item.label || "")
+          : item;
+    });
+    return options;
+  }
+
+  if (raw && typeof raw === "object") return raw;
+
+  // Supports the exact field names in your uploaded question bank.
+  const options = {};
+  ["A", "B", "C", "D", "E", "F"].forEach(function (letter) {
+    const candidates = [
+      letter + "_en", letter, letter.toLowerCase(),
+      "option" + letter, "option_" + letter, "Option" + letter
+    ];
+
+    for (const key of candidates) {
+      if (q[key] !== undefined && q[key] !== null &&
+          String(q[key]).trim() !== "") {
+        options[letter] = q[key];
+        break;
+      }
+    }
+  });
+  return options;
+}
+
+function getRawAnswer(q) {
+  return q.correct ?? q.answer ?? q.correctAnswer ??
+    q.correct_answer ?? q.correctOption ?? q.correct_option ??
+    q.key ?? q.ans ?? q.answerKey ?? "";
+}
+
+function getCorrectAnswer(q) {
+  const raw = getRawAnswer(q);
+  if (raw === null || raw === undefined || String(raw).trim() === "") return "";
+
+  const text = String(raw).trim();
+  const options = getOptions(q);
+  const labels = Object.keys(options);
+  const upper = text.toUpperCase();
+
+  const exactLabel = labels.find(function (label) {
+    return label.toUpperCase() === upper;
+  });
+  if (exactLabel) return exactLabel;
+
+  const matchLetter = upper.match(/^(?:OPTION\s*)?([A-F])(?:\b|[).])?$/);
+  if (matchLetter && labels.includes(matchLetter[1])) return matchLetter[1];
+
+  if (/^\d+$/.test(text)) {
+    const n = Number(text);
+    if (n >= 1 && n <= labels.length) return labels[n - 1];
+  }
+
+  const matchingText = labels.find(function (label) {
+    return String(options[label]).trim().toLowerCase() === text.toLowerCase();
+  });
+  return matchingText || "";
+}
+
+function questionKey(q) {
+  if (q.key) return String(q.key);
+  const source = [
+    getQuestionText(q), JSON.stringify(getOptions(q)), getCorrectAnswer(q)
+  ].join("|").toLowerCase().replace(/\s+/g, " ").trim();
+
+  let hash = 2166136261;
+  for (let i = 0; i < source.length; i++) {
+    hash ^= source.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return "q_" + (hash >>> 0).toString(36);
+}
+
+function normalizeQuestion(original) {
+  const q = Object.assign({}, original);
+  q.question_en = getQuestionText(q);
+  q.options = getOptions(q);
+  q.answer = getCorrectAnswer(q);
+  q.section = q.section || q.subject || q.topic || q.category || "General";
+  q.explanation_en = q.explanation_en || q.explanation || q.solution || q.rationale || "";
+  q.option_analysis_en = q.option_analysis_en || q.optionAnalysis || "";
+  q.exam_tip_en = q.exam_tip_en || q.examTip || "";
+  q.key = questionKey(q);
+  return q;
+}
+
+function normalizeMock(original) {
+  const mock = Object.assign({}, original);
+  mock.id = mock.id || makeId();
+  mock.title = String(mock.title || mock.name || "").trim();
+  mock.subject = mock.subject || "General";
+  mock.questions = Array.isArray(mock.questions)
+    ? mock.questions.map(normalizeQuestion).filter(function (q) {
+        return getQuestionText(q) &&
+          Object.keys(q.options || {}).length >= 2;
+      })
+    : [];
+  mock.attempts = Array.isArray(mock.attempts) ? mock.attempts : [];
+  mock.mistakes = Array.isArray(mock.mistakes) ? mock.mistakes : [];
+
+  // Ignore blank and failed-import entries on the dashboard.
+  if (!mock.title && mock.questions.length) mock.title = "Imported Mock";
+  return mock;
+}
+
+function loadStoredMocks() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    const list = Array.isArray(raw)
+      ? raw
+      : (raw && Array.isArray(raw.mocks) ? raw.mocks : []);
+
+    return list.map(normalizeMock).filter(function (mock) {
+      return mock.questions.length > 0 && Boolean(mock.title);
+    });
+  } catch (err) {
+    console.error("Could not read saved mocks", err);
+    return [];
+  }
+}
+
+function saveAll() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(mocks));
+    return true;
+  } catch (err) {
+    alert("Your browser could not save the data. Export a backup and check browser storage.");
+    return false;
+  }
+}
+
+function getMock(mockId) {
+  return mocks.find(function (mock) { return mock.id === mockId; });
+}
+
+function showView(viewId) {
+  document.querySelectorAll("main section").forEach(function (section) {
+    section.classList.add("hidden");
+  });
+  const target = document.getElementById(viewId);
+  if (target) target.classList.remove("hidden");
+  if (viewId === "homeView") renderDashboard();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function goHome() {
+  const testView = document.getElementById("testView");
+  const testIsOpen = testView && !testView.classList.contains("hidden");
+
+  if (testIsOpen && activeMockId) {
+    if (!confirm("Exit this test? Your unsubmitted answers will not be saved.")) return;
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+    activeMockId = null;
+    activeQuestions = [];
+    activeAnswers = {};
+  }
+  showView("homeView");
+}
+
+function showNotice(id, message, isError) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = message;
+  el.classList.remove("hidden", "error");
+  if (isError) el.classList.add("error");
+}
+
+function importMock() {
+  const fileInput = document.getElementById("mockJson");
+  const titleInput = document.getElementById("mockTitle");
+  const subjectInput = document.getElementById("mockSubject");
+  const file = fileInput.files && fileInput.files[0];
+
+  if (!file) {
+    showNotice("importStatus", "Please choose a JSON file first.", true);
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function () {
+    try {
+      const parsed = JSON.parse(reader.result);
+      let list;
+
+      if (Array.isArray(parsed)) {
+        list = parsed;
+      } else if (parsed && typeof parsed === "object") {
+        list = parsed.questions || parsed.mcqs || parsed.items ||
+          parsed.data || parsed.results || parsed.questionBank ||
+          parsed.question_bank;
+
+        if (!Array.isArray(list) && list && typeof list === "object") {
+          list = list.questions || list.mcqs || list.items || list.data;
+        }
+      }
+
+      if (!Array.isArray(list) || list.length === 0) {
+        throw new Error("No questions array found. The JSON must contain an array of questions.");
+      }
+
+      const normalized = list.map(function (item) {
+        return normalizeQuestion(item || {});
+      });
+
+      const valid = normalized.filter(function (q) {
+        return getQuestionText(q) &&
+          Object.keys(q.options || {}).length >= 2;
+      });
+
+      if (!valid.length) {
+        const keys = list[0] && typeof list[0] === "object"
+          ? Object.keys(list[0]).join(", ")
+          : "unknown";
+        throw new Error("Question fields were not recognised. Fields in first item: " + keys);
+      }
+
+      const importTitle = titleInput.value.trim() ||
+        (parsed && parsed.title) ||
+        (parsed && parsed.name) ||
+        file.name.replace(/\.json$/i, "");
+
+      const existing = mocks.find(function (item) {
+        return item.title.toLowerCase() === String(importTitle).toLowerCase();
+      });
+
+      if (existing) {
+        const replaceExisting = confirm(
+          'A mock named "' + importTitle + '" already exists. Replace it?'
+        );
+
+        if (replaceExisting) {
+          if ((existing.attempts || []).length &&
+              !confirm("This mock has saved attempts. Replacing it will remove those attempts. Continue?")) return;
+          mocks = mocks.filter(function (item) { return item.id !== existing.id; });
+        } else {
+          const alternate = prompt(
+            "Enter a different name for this imported mock:",
+            importTitle + " (2)"
+          );
+          if (!alternate || !alternate.trim()) return;
+          titleInput.value = alternate.trim();
+        }
+      }
+
+      const mock = normalizeMock({
+        id: makeId(),
+        title: titleInput.value.trim() || importTitle,
+        subject: subjectInput.value.trim() || (parsed && parsed.subject) || "Mixed / General",
+        questions: valid,
+        attempts: [],
+        mistakes: []
+      });
+
+      mocks.push(mock);
+      if (!saveAll()) {
+        mocks = mocks.filter(function (m) { return m.id !== mock.id; });
+        return;
+      }
+
+      titleInput.value = "";
+      subjectInput.value = "";
+      fileInput.value = "";
+      showNotice(
+        "importStatus",
+        "Successfully imported " + valid.length + " of " +
+          list.length + " questions from " + file.name + "."
+      );
+      renderDashboard();
+    } catch (err) {
+      showNotice("importStatus", "Import failed: " + err.message, true);
+    }
+  };
+
+  reader.onerror = function () {
+    showNotice("importStatus", "The selected file could not be read.", true);
+  };
+  reader.readAsText(file);
+}
+function getMistake(mock, key) {
+  return mock.mistakes.find(function (item) { return item.key === key; });
+}
+
+function getOpenMistakes(mock) {
+  return mock.mistakes.filter(function (item) { return !item.mastered; });
+}
+
+function startMock(mockId, mode) {
+  const mock = getMock(mockId);
+  if (!mock) return;
+  if (!Array.isArray(mock.questions) || !mock.questions.length) {
+    alert("This mock has no usable questions. Please delete it and import your JSON file again.");
+    return;
+  }
+
+  mode = mode || "full";
+  let questions = mock.questions.slice();
+
+  if (mode === "incorrect") {
+    const keys = new Set(getOpenMistakes(mock).map(function (item) { return item.key; }));
+    questions = questions.filter(function (q) { return keys.has(q.key); });
+    if (!questions.length) {
+      alert("There are no incorrect questions waiting for revision in this mock. Attempt the full mock first.");
+      return;
+    }
+  } else {
+    const countValue = document.getElementById("questionCount").value;
+    if (countValue !== "all") questions = questions.slice(0, Number(countValue));
+  }
+
+  activeMockId = mockId;
+  activeMode = mode;
+  activeQuestions = questions.map(normalizeQuestion);
+  activeAnswers = {};
+  currentIndex = 0;
+  lastResult = null;
+
+  const minutes = Number(document.getElementById("duration").value || 0);
+  remainingSeconds = minutes > 0 ? minutes * 60 : 0;
+
+  document.getElementById("testTitle").textContent = mock.title;
+  document.getElementById("testModeLabel").textContent =
+    mode === "incorrect" ? "Retry Incorrect Questions" : "Full Mock Test";
+
+  showView("testView");
+  renderQuestion();
+  updateTimerDisplay();
+
+  clearInterval(timerInterval);
+  timerInterval = null;
+
+  if (remainingSeconds > 0) {
+    timerInterval = setInterval(function () {
+      remainingSeconds -= 1;
+      updateTimerDisplay();
+      if (remainingSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        submitTest(true);
+      }
+    }, 1000);
+  }
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById("timer");
+  if (!el) return;
+
+  if (remainingSeconds <= 0) {
+    el.textContent = "No timer";
+    return;
+  }
+
+  const minutes = Math.floor(remainingSeconds / 60);
+  const seconds = remainingSeconds % 60;
+  el.textContent = String(minutes).padStart(2, "0") + ":" +
+    String(seconds).padStart(2, "0");
+}
+
+function renderQuestion() {
+  const q = activeQuestions[currentIndex];
+  if (!q) return;
+
+  document.getElementById("questionNumber").textContent =
+    "QUESTION " + (currentIndex + 1);
+  document.getElementById("questionText").textContent = getQuestionText(q);
+  document.getElementById("questionPosition").textContent =
+    "Question " + (currentIndex + 1) + " of " + activeQuestions.length;
+
+  const answered = Object.keys(activeAnswers).filter(function (key) {
+    return Boolean(activeAnswers[key]);
+  }).length;
+  document.getElementById("answeredCount").textContent = "Answered: " + answered;
+  document.getElementById("testProgressBar").style.width =
+    ((currentIndex + 1) / Math.max(1, activeQuestions.length) * 100) + "%";
+
+  const imageBox = document.getElementById("questionImage");
+  imageBox.replaceChildren();
+  const imageUrl = q.image || q.image_url || q.imageUrl;
+
+  if (imageUrl && /^https?:\/\//i.test(String(imageUrl))) {
+    const img = document.createElement("img");
+    img.src = String(imageUrl);
+    img.alt = "Question illustration";
+    img.style.maxWidth = "100%";
+    img.style.maxHeight = "260px";
+    imageBox.appendChild(img);
+  }
+
+  const optionList = document.getElementById("optionList");
+  optionList.replaceChildren();
+  const options = q.options || getOptions(q);
+
+  Object.keys(options).forEach(function (letter) {
+    const label = document.createElement("label");
+    label.className = "option" +
+      (activeAnswers[q.key] === letter ? " selected" : "");
+
+    const radio = document.createElement("input");
+    radio.type = "radio";
+    radio.name = "currentAnswer";
+    radio.value = letter;
+    radio.checked = activeAnswers[q.key] === letter;
+
+    radio.addEventListener("change", function () {
+      activeAnswers[q.key] = letter;
+      renderQuestion();
+    });
+
+    const text = document.createElement("span");
+    text.textContent = letter + ". " + options[letter];
+    label.append(radio, text);
+    optionList.appendChild(label);
+  });
+
+  const palette = document.getElementById("questionPalette");
+  palette.replaceChildren();
+
+  activeQuestions.forEach(function (question, i) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "paletteButton";
+
+    if (activeAnswers[question.key]) button.classList.add("answered");
+    if (i === currentIndex) button.classList.add("current");
+
+    button.textContent = String(i + 1);
+    button.setAttribute("aria-label", "Go to question " + (i + 1));
+    button.addEventListener("click", function () {
+      currentIndex = i;
+      renderQuestion();
+    });
+    palette.appendChild(button);
+  });
+}
+
+function previousQuestion() {
+  if (currentIndex > 0) {
+    currentIndex -= 1;
+    renderQuestion();
+  }
+}
+
+function nextQuestion() {
+  if (currentIndex < activeQuestions.length - 1) {
+    currentIndex += 1;
+    renderQuestion();
+  }
+}
+
+function clearResponse() {
+  const q = activeQuestions[currentIndex];
+  if (!q) return;
+  delete activeAnswers[q.key];
+  renderQuestion();
+}
+
+function confirmExitTest() {
+  goHome();
+}
+
+function submitTest(timeExpired) {
+  if (!activeMockId || !activeQuestions.length) return;
+  if (!timeExpired && !confirm("Submit this test and save your answers?")) return;
+
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
+
+  const mock = getMock(activeMockId);
+  if (!mock) return;
+
+  let correct = 0;
+  let wrong = 0;
+  let skipped = 0;
+
+  const answers = activeQuestions.map(function (q) {
+    const selected = activeAnswers[q.key] || "";
+    const correctAnswer = getCorrectAnswer(q);
+    const isCorrect = Boolean(selected && correctAnswer && selected === correctAnswer);
+
+    if (!selected) skipped += 1;
+    else if (isCorrect) correct += 1;
+    else wrong += 1;
+
+    return {
+      questionKey: q.key,
+      question_en: getQuestionText(q),
+      section: q.section || mock.subject || "General",
+      options: q.options || getOptions(q),
+      selected: selected,
+      correctAnswer: correctAnswer,
+      explanation_en: q.explanation_en || "",
+      option_analysis_en: q.option_analysis_en || "",
+      exam_tip_en: q.exam_tip_en || "",
+      isCorrect: isCorrect
+    };
+  });
+
+  const total = activeQuestions.length;
+  const attempt = {
+    id: makeId(),
+    date: new Date().toISOString(),
+    mode: activeMode,
+    score: total ? Math.round(correct * 100 / total) : 0,
+    correct: correct,
+    wrong: wrong,
+    skipped: skipped,
+    total: total,
+    answers: answers
+  };
+
+  mock.attempts.push(attempt);
+
+  answers.forEach(function (answer) {
+    let mistake = getMistake(mock, answer.questionKey);
+
+    if (!answer.isCorrect) {
+      if (!mistake) {
+        mistake = {
+          key: answer.questionKey,
+          question_en: answer.question_en,
+          section: answer.section,
+          wrongCount: 0,
+          retryCount: 0,
+          consecutiveCorrect: 0,
+          mastered: false,
+          lastWrong: attempt.date,
+          options: answer.options,
+          correctAnswer: answer.correctAnswer,
+          explanation_en: answer.explanation_en
+        };
+        mock.mistakes.push(mistake);
+      }
+
+      mistake.wrongCount = (mistake.wrongCount || 0) + 1;
+      mistake.consecutiveCorrect = 0;
+      mistake.mastered = false;
+      mistake.lastWrong = attempt.date;
+      mistake.question_en = answer.question_en;
+      mistake.section = answer.section;
+      mistake.options = answer.options;
+      mistake.correctAnswer = answer.correctAnswer;
+      mistake.explanation_en = answer.explanation_en;
+
+    } else if (mistake && !mistake.mastered) {
+      mistake.retryCount = (mistake.retryCount || 0) + 1;
+      mistake.consecutiveCorrect = (mistake.consecutiveCorrect || 0) + 1;
+      if (mistake.consecutiveCorrect >= 2) {
+        mistake.mastered = true;
+        mistake.masteredDate = attempt.date;
+      }
+    }
+  });
+
+  saveAll();
+  lastResult = { mockId: mock.id, attemptId: attempt.id };
+
+  document.getElementById("resultTitle").textContent =
+    activeMode === "incorrect" ? "Retry Result" : "Mock Test Result";
+  document.getElementById("resultSubtitle").textContent =
+    mock.title + " | " + new Date(attempt.date).toLocaleString();
+  document.getElementById("resultScore").textContent = attempt.score + "%";
+  document.getElementById("resultCorrect").textContent = String(correct);
+  document.getElementById("resultWrong").textContent = String(wrong);
+  document.getElementById("resultSkipped").textContent = String(skipped);
+
+  const openCount = getOpenMistakes(mock).length;
+  document.getElementById("resultMessage").textContent =
+    (timeExpired ? "Time expired. " : "Attempt saved. ") +
+    openCount + " question(s) remain in your revision list. " +
+    "A question is marked mastered after two consecutive correct answers.";
+
+  const retryButton = document.getElementById("retryIncorrectButton");
+  retryButton.disabled = openCount === 0;
+  retryButton.textContent = openCount
+    ? "Retry Incorrect Questions (" + openCount + ")"
+    : "No Incorrect Questions to Retry";
+
+  renderAnswerReview(attempt, "answerReview");
+  showView("resultView");
+}
+
+function renderAnswerReview(attempt, containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  container.replaceChildren();
+  const heading = document.createElement("h3");
+  heading.textContent = "Quick Answer Review";
+  container.appendChild(heading);
+
+  (attempt.answers || []).forEach(function (answer, index) {
+    const card = document.createElement("div");
+    card.className = "reviewCard";
+
+    const title = document.createElement("h4");
+    title.textContent = (index + 1) + ". " + answer.question_en;
+    card.appendChild(title);
+
+    const status = document.createElement("p");
+    status.className = answer.isCorrect
+      ? "correctText"
+      : (answer.selected ? "wrongText" : "muted");
+    status.textContent = !answer.selected
+      ? "Unanswered"
+      : (answer.isCorrect ? "Correct" : "Incorrect");
+    card.appendChild(status);
+
+    Object.keys(answer.options || {}).forEach(function (letter) {
+      const line = document.createElement("p");
+      let label = letter + ". " + answer.options[letter];
+      if (letter === answer.correctAnswer) label += " — Correct answer";
+      if (letter === answer.selected) label += " — Your answer";
+      line.textContent = label;
+      card.appendChild(line);
+    });
+
+    if (answer.explanation_en) {
+      const p = document.createElement("p");
+      p.textContent = "Explanation: " + answer.explanation_en;
+      card.appendChild(p);
+    }
+    if (answer.option_analysis_en) {
+      const p = document.createElement("p");
+      p.textContent = "Option analysis: " + answer.option_analysis_en;
+      card.appendChild(p);
+    }
+    if (answer.exam_tip_en) {
+      const p = document.createElement("p");
+      p.textContent = "Exam tip: " + answer.exam_tip_en;
+      card.appendChild(p);
+    }
+    container.appendChild(card);
+  });
+}
+
+function retryIncorrect() {
+  if (!lastResult) {
+    alert("Submit a test first to build your incorrect-question list.");
+    return;
+  }
+  startMock(lastResult.mockId, "incorrect");
+}
+
+function reviewAttempt() {
+  if (!lastResult) return;
+  const mock = getMock(lastResult.mockId);
+  const attempt = mock && mock.attempts.find(function (item) {
+    return item.id === lastResult.attemptId;
+  });
+  if (!attempt) return;
+
+  document.getElementById("reviewTitle").textContent =
+    mock.title + " — Attempt Review";
+
+  const container = document.getElementById("reviewContent");
+  if (!Array.isArray(attempt.answers)) {
+    container.textContent =
+      "This older attempt saved only the overall score, so question-level answers are not available for review.";
+  } else {
+    renderAnswerReview(attempt, "reviewContent");
+  }
+  showView("reviewView");
+}
+
+function reviewMockHistory(mockId) {
+  const mock = getMock(mockId);
+  if (!mock) return;
+
+  document.getElementById("reviewTitle").textContent =
+    mock.title + " — Attempt History";
+
+  const container = document.getElementById("reviewContent");
+  container.replaceChildren();
+  const history = (mock.attempts || []).slice().reverse();
+
+  if (!history.length) {
+    container.textContent = "No attempts recorded for this mock yet.";
+  }
+
+  history.forEach(function (attempt, index) {
+    const card = document.createElement("div");
+    card.className = "reviewCard";
+
+    const title = document.createElement("h4");
+    title.textContent = "Attempt " + (history.length - index) +
+      " — " + (attempt.score ?? 0) + "%";
+    card.appendChild(title);
+
+    const p = document.createElement("p");
+    p.textContent = new Date(attempt.date).toLocaleString() +
+      " | Correct: " + (attempt.correct ?? "-") +
+      " | Wrong: " + (attempt.wrong ?? "-") +
+      " | Total: " + (attempt.total ?? "-");
+    card.appendChild(p);
+
+    if (Array.isArray(attempt.answers)) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = "Review this attempt";
+      button.addEventListener("click", function () {
+        lastResult = { mockId: mock.id, attemptId: attempt.id };
+        reviewAttempt();
+      });
+      card.appendChild(button);
+    } else {
+      const note = document.createElement("p");
+      note.className = "muted small";
+      note.textContent = "Detailed answers were not saved in this older attempt.";
+      card.appendChild(note);
+    }
+
+    container.appendChild(card);
+  });
+
+  showView("reviewView");
+}
+function downloadFile(content, filename, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+}
+
+function exportAll() {
+  const backup = {
+    app: "Rajasthan MVSI Test Series",
+    version: 4,
+    exportedAt: new Date().toISOString(),
+    mocks: mocks
+  };
+  downloadFile(JSON.stringify(backup, null, 2),
+    "mvsi-mock-series-backup.json", "application/json");
+}
+
+function exportMock(mockId) {
+  const mock = getMock(mockId);
+  if (!mock) return;
+  const filename = mock.title.replace(/[^a-z0-9_-]+/gi, "_") + ".json";
+  downloadFile(JSON.stringify(mock, null, 2), filename, "application/json");
+}
+
+function restoreAll() {
+  const input = document.getElementById("backupInput");
+  const file = input.files && input.files[0];
+
+  if (!file) {
+    showNotice("backupStatus", "Please select a backup JSON file first.", true);
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function () {
+    try {
+      const parsed = JSON.parse(reader.result);
+      const list = Array.isArray(parsed) ? parsed : parsed.mocks;
+
+      if (!Array.isArray(list)) {
+        throw new Error("The backup does not contain a mocks list.");
+      }
+
+      if (!confirm("Restore this backup? Your current mock list will be replaced.")) return;
+
+      const restored = list.map(normalizeMock).filter(function (mock) {
+        return mock.title && mock.questions.length > 0;
+      });
+
+      const previous = mocks;
+      mocks = restored;
+
+      if (!saveAll()) {
+        mocks = previous;
+        return;
+      }
+
+      input.value = "";
+      showNotice("backupStatus", "Backup restored. Mocks loaded: " + mocks.length + ".");
+      renderDashboard();
+    } catch (err) {
+      showNotice("backupStatus", "Restore failed: " + err.message, true);
+    }
+  };
+  reader.onerror = function () {
+    showNotice("backupStatus", "Could not read the backup file.", true);
+  };
+  reader.readAsText(file);
+}
+
+function deleteMock(mockId) {
+  const mock = getMock(mockId);
+  if (!mock) return;
+
+  if (!confirm('Delete "' + mock.title + '" and its saved attempts?')) return;
+
+  const previous = mocks;
+  mocks = mocks.filter(function (item) { return item.id !== mockId; });
+
+  if (!saveAll()) {
+    mocks = previous;
+    return;
+  }
+  renderDashboard();
+}
+
+function renderDashboard() {
+  const list = document.getElementById("mockList");
+  list.replaceChildren();
+
+  // Omit empty or unusable records when displaying the dashboard.
+  mocks = mocks.filter(function (mock) {
+    return mock.title && Array.isArray(mock.questions) && mock.questions.length > 0;
+  });
+
+  const empty = document.getElementById("emptyMocks");
+  empty.classList.toggle("hidden", mocks.length > 0);
+
+  let attemptCount = 0;
+  let totalScore = 0;
+  let scoreCount = 0;
+  let revisionCount = 0;
+  const allAttempts = [];
+
+  mocks.forEach(function (mock) {
+    const attempts = mock.attempts || [];
+    const latest = attempts.length ? attempts[attempts.length - 1] : null;
+    const openMistakes = getOpenMistakes(mock).length;
+
+    attemptCount += attempts.length;
+    revisionCount += openMistakes;
+
+    attempts.forEach(function (attempt) {
+      if (typeof attempt.score === "number") {
+        totalScore += attempt.score;
+        scoreCount += 1;
+      }
+      allAttempts.push(Object.assign({
+        mockTitle: mock.title,
+        mockId: mock.id
+      }, attempt));
+    });
+
+    const card = document.createElement("div");
+    card.className = "mockCard";
+
+    const title = document.createElement("h3");
+    title.textContent = mock.title;
+    card.appendChild(title);
+
+    const info = document.createElement("p");
+    info.className = "muted";
+    info.textContent = (mock.subject || "General") + " | " +
+      mock.questions.length + " questions";
+    card.appendChild(info);
+
+    const stats = document.createElement("p");
+    stats.textContent = "Attempts: " + attempts.length +
+      " | Latest score: " + (latest ? (latest.score ?? 0) + "%" : "Not attempted") +
+      " | Questions to revise: " + openMistakes;
+    card.appendChild(stats);
+
+    const actions = document.createElement("div");
+    actions.className = "actions";
+
+    const start = document.createElement("button");
+    start.type = "button";
+    start.textContent = "Start Full Mock";
+    start.addEventListener("click", function () {
+      startMock(mock.id, "full");
+    });
+    actions.appendChild(start);
+
+    const retry = document.createElement("button");
+    retry.type = "button";
+    retry.className = "secondary";
+    retry.textContent = "Retry Incorrect (" + openMistakes + ")";
+    retry.disabled = openMistakes === 0;
+    retry.addEventListener("click", function () {
+      startMock(mock.id, "incorrect");
+    });
+    actions.appendChild(retry);
+
+    const history = document.createElement("button");
+    history.type = "button";
+    history.className = "secondary";
+    history.textContent = "Attempt History";
+    history.addEventListener("click", function () {
+      reviewMockHistory(mock.id);
+    });
+    actions.appendChild(history);
+
+    const exportButton = document.createElement("button");
+    exportButton.type = "button";
+    exportButton.className = "secondary";
+    exportButton.textContent = "Export Mock";
+    exportButton.addEventListener("click", function () {
+      exportMock(mock.id);
+    });
+    actions.appendChild(exportButton);
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "danger";
+    remove.textContent = "Delete Mock";
+    remove.addEventListener("click", function () {
+      deleteMock(mock.id);
+    });
+    actions.appendChild(remove);
+
+    card.appendChild(actions);
+    list.appendChild(card);
+  });
+
+  document.getElementById("statMocks").textContent = mocks.length;
+  document.getElementById("statAttempts").textContent = attemptCount;
+  document.getElementById("statAverage").textContent = scoreCount
+    ? Math.round(totalScore / scoreCount) + "%"
+    : "-";
+  document.getElementById("statRevision").textContent = revisionCount;
+
+  saveAll();
+  renderAttemptHistory(allAttempts);
+  renderSubjectStats();
+  renderWeakQuestions();
+  drawScoreChart(allAttempts);
+}
+
+function renderAttemptHistory(attempts) {
+  const box = document.getElementById("attemptHistory");
+  box.replaceChildren();
+
+  const recent = attempts.slice().sort(function (a, b) {
+    return new Date(b.date) - new Date(a.date);
+  }).slice(0, 10);
+
+  if (!recent.length) {
+    box.textContent = "Your attempts will appear here after you submit a test.";
+    return;
+  }
+
+  recent.forEach(function (attempt) {
+    const p = document.createElement("p");
+    p.textContent = new Date(attempt.date).toLocaleDateString() +
+      " | " + attempt.mockTitle + " | Score: " + (attempt.score ?? 0) +
+      "% | Correct: " + (attempt.correct ?? 0) + "/" + (attempt.total ?? 0);
+    box.appendChild(p);
+  });
+}
+
+function renderSubjectStats() {
+  const box = document.getElementById("subjectStats");
+  box.replaceChildren();
+  const subjects = {};
+
+  mocks.forEach(function (mock) {
+    (mock.attempts || []).forEach(function (attempt) {
+      (attempt.answers || []).forEach(function (answer) {
+        const name = answer.section || mock.subject || "General";
+        if (!subjects[name]) subjects[name] = { attempts: 0, correct: 0 };
+        subjects[name].attempts += 1;
+        if (answer.isCorrect) subjects[name].correct += 1;
+      });
+    });
+  });
+
+  const entries = Object.entries(subjects);
+  if (!entries.length) {
+    box.textContent = "Subject statistics will appear after you submit a test.";
+    return;
+  }
+
+  entries.sort(function (a, b) {
+    return a[0].localeCompare(b[0]);
+  }).forEach(function (entry) {
+    const name = entry[0];
+    const data = entry[1];
+    const accuracy = data.attempts
+      ? Math.round(data.correct * 100 / data.attempts)
+      : 0;
+
+    const p = document.createElement("p");
+    p.textContent = name + ": " + accuracy + "% accuracy (" +
+      data.correct + "/" + data.attempts + " answers)";
+    box.appendChild(p);
+  });
+}
+
+function renderWeakQuestions() {
+  const box = document.getElementById("weakQuestions");
+  box.replaceChildren();
+  const items = [];
+
+  mocks.forEach(function (mock) {
+    mock.mistakes.filter(function (item) { return !item.mastered; })
+      .forEach(function (item) {
+        items.push({
+          mock: mock,
+          question: item
+        });
+      });
+  });
+
+  items.sort(function (a, b) {
+    return (b.question.wrongCount || 0) - (a.question.wrongCount || 0);
+  });
+
+  if (!items.length) {
+    box.textContent = "No questions are waiting for revision. Complete a mock to identify questions to practise.";
+    return;
+  }
+
+  items.slice(0, 20).forEach(function (item) {
+    const card = document.createElement("div");
+    card.className = "reviewCard";
+
+    const q = document.createElement("p");
+    q.textContent = item.question.question_en;
+    card.appendChild(q);
+
+    const detail = document.createElement("p");
+    detail.className = "muted small";
+    detail.textContent = item.mock.title + " | " +
+      (item.question.section || "General") +
+      " | Incorrect: " + (item.question.wrongCount || 0) + " time(s)";
+    card.appendChild(detail);
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = "Retry this mock's incorrect questions";
+    button.addEventListener("click", function () {
+      startMock(item.mock.id, "incorrect");
+    });
+    card.appendChild(button);
+
+    box.appendChild(card);
+  });
+}
+
+function drawScoreChart(attempts) {
+  const canvas = document.getElementById("scoreChart");
+  const message = document.getElementById("chartMessage");
+  if (!canvas) return;
+
+  const width = Math.max(280, canvas.clientWidth || 500);
+  const height = 190;
+  const ratio = window.devicePixelRatio || 1;
+
+  canvas.width = width * ratio;
+  canvas.height = height * ratio;
+  canvas.style.width = "100%";
+  canvas.style.height = height + "px";
+
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  ctx.clearRect(0, 0, width, height);
+
+  const recent = attempts.slice().sort(function (a, b) {
+    return new Date(a.date) - new Date(b.date);
+  }).slice(-10);
+
+  if (!recent.length) {
+    if (message) message.textContent = "Your score chart appears after your first attempt.";
+    return;
+  }
+  if (message) message.textContent = "Your 10 most recent attempts.";
+
+  const left = 38, right = 10, top = 12, bottom = 26;
+  const chartWidth = width - left - right;
+  const chartHeight = height - top - bottom;
+
+  ctx.font = "11px sans-serif";
+  ctx.textAlign = "right";
+  ctx.fillStyle = "#657487";
+
+  [0, 50, 100].forEach(function (value) {
+    const y = top + chartHeight * (1 - value / 100);
+    ctx.beginPath();
+    ctx.moveTo(left, y);
+    ctx.lineTo(width - right, y);
+    ctx.strokeStyle = "#d7e0e7";
+    ctx.stroke();
+    ctx.fillText(value + "%", left - 6, y + 4);
+  });
+
+  const step = chartWidth / recent.length;
+  const barWidth = Math.min(24, step * 0.55);
+
+  recent.forEach(function (attempt, index) {
+    const score = Math.max(0, Math.min(100, Number(attempt.score) || 0));
+    const barHeight = chartHeight * score / 100;
+    const x = left + step * index + (step - barWidth) / 2;
+    const y = top + chartHeight - barHeight;
+
+    ctx.fillStyle = "#285d7d";
+    ctx.fillRect(x, y, barWidth, barHeight);
+    ctx.fillStyle = "#475569";
+    ctx.textAlign = "center";
+    ctx.fillText(String(index + 1), x + barWidth / 2, height - 9);
+  });
+}
+
+window.addEventListener("resize", function () {
+  const attempts = [];
+  mocks.forEach(function (mock) {
+    (mock.attempts || []).forEach(function (attempt) {
+      attempts.push(Object.assign({ mockTitle: mock.title, mockId: mock.id }, attempt));
+    });
+  });
+  drawScoreChart(attempts);
+});
+
+function initApp() {
+  mocks = loadStoredMocks();
+  // Normalize saved records and remove invalid blank entries.
+  saveAll();
+  renderDashboard();
+  showView("homeView");
+}
+
+initApp();
+</script>
+</body>
+</html>
