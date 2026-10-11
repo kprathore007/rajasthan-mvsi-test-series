@@ -1,0 +1,12 @@
+{
+  "name": "MVSI Abhyas — Rajasthan Test Series",
+  "short_name": "MVSI Abhyas",
+  "description": "Personal bilingual Rajasthan MVSI mock test app with offline support.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#fbf7ef",
+  "theme_color": "#18324b",
+  "icons": [{"src":"icons/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
