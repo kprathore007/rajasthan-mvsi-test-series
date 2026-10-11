@@ -1,307 +1,260 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#18324b">
+<meta name="theme-color" content="#17324d">
 <title>Rajasthan MVSI Test Series</title>
-<link rel="manifest" href="manifest.webmanifest">
 <style>
-:root{
---navy:#18324b;--blue:#285779;--orange:#d97728;
---bg:#f4f7fa;--card:#fff;--text:#1e293b;
---muted:#64748b;--line:#dce4ec;--green:#16834a;
---red:#b42318;
+:root {
+  --navy:#17324d; --blue:#285d7d; --blue-soft:#e8f1f7; --bg:#f3f6f9;
+  --ink:#202b38; --muted:#657487; --line:#d7e0e7; --green:#18794e;
+  --green-soft:#e8f6ef; --red:#b42318; --red-soft:#fff0ee; --white:#fff;
+  --radius:16px; --shadow:0 2px 10px rgba(23,50,77,.06);
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);
-font:16px/1.5 system-ui,Arial,sans-serif}
-header{background:var(--navy);color:white;padding:17px}
-.brand{max-width:1000px;margin:auto;font-size:19px;font-weight:800}
-.brand small{display:block;font-size:12px;font-weight:500;color:#d8e5ee}
-main{max-width:1000px;margin:18px auto;padding:0 12px 35px}
-.hero{background:linear-gradient(135deg,var(--navy),var(--blue));
-color:white;border-radius:16px;padding:22px;margin-bottom:15px}
-.hero h1{font-size:25px;margin:0 0 5px}
-.hero p{margin:0;color:#e1ebf3}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:12px 0}
-.card,.panel{background:var(--card);border:1px solid var(--line);
-border-radius:14px;padding:15px;margin-bottom:12px}
-.card h2,.panel h2{font-size:18px;margin:0 0 8px}
-p{margin-top:5px}
-.muted{color:var(--muted);font-size:14px}
-button{border:0;border-radius:9px;background:var(--blue);color:white;
-padding:11px 14px;font:inherit;font-weight:650;cursor:pointer}
-button.secondary{background:#e8eef4;color:var(--navy)}
-button.danger{background:#a83232}
-button:disabled{opacity:.45}
-input,select,textarea{width:100%;padding:11px;border:1px solid #cbd5df;
-border-radius:9px;background:white;color:var(--text);font:inherit}
-label{display:block;font-weight:650;margin:10px 0 5px}
-.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}
-.row>*{flex:1}
-.hidden{display:none!important}
-.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0}
-.stat{background:#eef3f7;padding:12px;border-radius:10px}
-.stat strong{display:block;font-size:24px;color:var(--navy)}
-.pill{display:inline-block;background:#eaf0f5;color:var(--navy);
-border-radius:20px;padding:3px 9px;font-size:12px;font-weight:700}
-.progress{height:8px;background:#e2e8f0;border-radius:10px;overflow:hidden;margin:12px 0}
-.progress span{display:block;height:100%;width:0;background:var(--orange)}
-.option{display:block;width:100%;text-align:left;background:white;color:var(--text);
-border:1px solid var(--line);margin:8px 0;font-weight:500}
-.option.selected{border:2px solid var(--blue);background:#edf5fb}
-.option.correct{background:#e8f8ee;border-color:var(--green)}
-.option.wrong{background:#fff0ef;border-color:var(--red)}
-.feedback{white-space:pre-wrap;background:#f0f4f7;padding:12px;border-radius:10px;margin-top:12px}
-.good{background:#e8f8ee}.bad{background:#fff0ef}
-.history-item{border-bottom:1px solid var(--line);padding:12px 0}
-.history-item:last-child{border-bottom:0}
-.bar-row{display:grid;grid-template-columns:minmax(75px,1fr) 2fr 45px;gap:8px;align-items:center;margin:10px 0;font-size:13px}
-.bar{height:10px;background:#e5eaf0;border-radius:8px;overflow:hidden}
-.bar span{height:100%;display:block;background:var(--blue)}
-canvas{width:100%;height:190px;display:block}
-footer{text-align:center;padding:20px;color:var(--muted);font-size:13px}
-@media(min-width:600px){.stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; }
+header { background:var(--navy); color:#fff; padding:18px 16px; }
+.headerInner { max-width:1080px; margin:auto; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+header h1 { font-size:1.22rem; margin:0; line-height:1.3; }
+header p { color:#d6e1ea; margin:5px 0 0; font-size:.9rem; }
+main { max-width:1080px; margin:20px auto; padding:0 14px 42px; }
+h2 { font-size:1.28rem; line-height:1.3; margin:0 0 8px; }
+h3 { font-size:1.05rem; line-height:1.4; margin:0 0 8px; }
+h4 { margin:0 0 8px; line-height:1.4; }
+p { margin:7px 0; }
+.muted { color:var(--muted); }
+.small { font-size:.86rem; }
+.hidden { display:none !important; }
+.panel { background:var(--white); border:1px solid var(--line); border-radius:var(--radius); padding:19px; margin-bottom:16px; box-shadow:var(--shadow); }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,285px),1fr)); gap:13px; }
+.statGrid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:16px 0; }
+.statCard,.mockCard,.reviewCard,.questionCard { border:1px solid var(--line); border-radius:13px; padding:14px; background:#fff; min-width:0; }
+.statCard span { display:block; color:var(--muted); font-size:.85rem; }
+.statCard strong { display:block; font-size:1.45rem; margin-top:4px; overflow-wrap:anywhere; }
+.mockCard h3 { overflow-wrap:anywhere; }
+.actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:13px; }
+.actions.between { justify-content:space-between; }
+button,.button { appearance:none; border:0; border-radius:11px; background:var(--blue); color:#fff; padding:11px 14px; font:inherit; font-weight:650; cursor:pointer; min-height:44px; }
+button.secondary { background:#e8eef3; color:var(--navy); }
+button.danger { background:#fce8e6; color:#9b1c13; }
+button:disabled { opacity:.48; cursor:not-allowed; }
+input,select,textarea { width:100%; max-width:100%; font:inherit; color:var(--ink); border:1px solid #cbd5dd; background:#fff; border-radius:10px; padding:11px 12px; min-height:46px; }
+input[type="file"] { padding:8px; }
+label.fieldLabel { display:block; font-weight:650; margin:14px 0 6px; }
+.inlineRow { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); gap:12px; }
+.notice { border-radius:10px; padding:11px 13px; margin-top:12px; background:var(--blue-soft); color:var(--navy); overflow-wrap:anywhere; }
+.notice.error { color:var(--red); background:var(--red-soft); }
+details { margin-top:14px; }
+summary { font-weight:650; cursor:pointer; }
+pre { white-space:pre-wrap; overflow-wrap:anywhere; padding:12px; background:#f3f6f9; border-radius:10px; font-size:.82rem; }
+.testTop { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; }
+.timerBox { text-align:right; padding:8px 12px; border-radius:10px; background:var(--blue-soft); min-width:100px; }
+.timerBox span,.timerBox strong { display:block; }
+.timerBox strong { font-size:1.25rem; font-variant-numeric:tabular-nums; }
+.progressTrack { width:100%; height:8px; background:#e6edf2; border-radius:99px; overflow:hidden; margin:14px 0 8px; }
+.progressFill { height:100%; width:0; background:var(--blue); transition:width .15s; }
+.testMeta { display:flex; justify-content:space-between; gap:10px; color:var(--muted); font-size:.9rem; flex-wrap:wrap; }
+.questionPalette { display:flex; flex-wrap:wrap; gap:6px; margin:13px 0; }
+.paletteButton { min-width:39px; min-height:39px; padding:5px; border-radius:8px; background:#e8eef3; color:var(--ink); }
+.paletteButton.answered { background:#d8eee3; color:#145a39; }
+.paletteButton.current { outline:3px solid #77a7c7; outline-offset:1px; }
+.questionNumber { color:var(--muted); font-weight:750; font-size:.8rem; letter-spacing:.07em; margin-bottom:8px; }
+#questionText { font-size:1.15rem; line-height:1.55; white-space:pre-wrap; overflow-wrap:anywhere; }
+.optionList { display:grid; gap:9px; margin-top:15px; }
+.option { display:flex; align-items:flex-start; gap:10px; border:1px solid var(--line); border-radius:11px; padding:12px; cursor:pointer; }
+.option.selected { background:var(--blue-soft); border-color:#77a7c7; }
+.option input { width:18px; min-height:18px; height:18px; margin:3px 0 0; flex:0 0 auto; }
+.option span { overflow-wrap:anywhere; }
+.resultGrid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:16px 0; }
+.resultGrid .statCard strong { font-size:1.55rem; }
+.reviewCard { margin:11px 0; overflow-wrap:anywhere; }
+.correctText { color:var(--green); font-weight:700; }
+.wrongText { color:var(--red); font-weight:700; }
+footer { max-width:1080px; margin:0 auto; padding:0 16px 26px; text-align:center; color:var(--muted); font-size:.85rem; }
+canvas { display:block; width:100%; max-width:100%; }
+@media (min-width:700px) { .statGrid { grid-template-columns:repeat(4,minmax(0,1fr)); } .resultGrid { grid-template-columns:repeat(4,minmax(0,1fr)); } .panel { padding:22px; } }
+@media (max-width:420px) { main { padding-left:10px; padding-right:10px; margin-top:12px; } .panel { padding:14px; } button { flex:1 1 auto; } .timerBox { text-align:left; } }
 </style>
 </head>
 <body>
 <header>
-<div class="brand">RAJASTHAN MVSI
-<small>Personal Test Series · Progress & Performance Tracker</small>
-</div>
+  <div class="headerInner">
+    <div>
+      <h1>Rajasthan MVSI Test Series</h1>
+      <p>Practice 鈥� Review 鈥� Track your progress</p>
+    </div>
+    <button class="secondary" type="button" onclick="goHome()">Dashboard</button>
+  </div>
 </header>
+
 <main>
-<section id="homeView">
-<div class="hero">
-<h1>MVSI Test Series</h1>
-<p>Practise, review mistakes, track progress and improve your exam performance.</p>
-</div>
-
-<section class="panel">
-<h2>Overall Progress</h2>
-<div class="stats">
-<div class="stat"><strong id="totalAttempts">0</strong><span>Attempts</span></div>
-<div class="stat"><strong id="averageScore">0%</strong><span>Average score</span></div>
-<div class="stat"><strong id="bestScore">0%</strong><span>Best score</span></div>
-<div class="stat"><strong id="totalQuestions">0</strong><span>Questions in mocks</span></div>
-</div>
-</section>
-
-<section class="panel">
-<h2>Score Trend</h2>
-<p class="muted">Your scores across completed attempts.</p>
-<canvas id="scoreChart" height="190"></canvas>
-<p id="chartMessage" class="muted">Complete a mock to begin tracking your scores.</p>
-</section>
-
-<div class="grid">
-<article class="card">
-<h2>Test Settings</h2>
-<label for="questionCount">Questions per attempt</label>
-<select id="questionCount">
-<option value="all">All questions</option>
-<option value="10">10 questions</option>
-<option value="25">25 questions</option>
-<option value="50">50 questions</option>
-<option value="100">100 questions</option>
-</select>
-<label for="duration">Test duration</label>
-<select id="duration">
-<option value="0">No timer</option>
-<option value="30">30 minutes</option>
-<option value="60" selected>60 minutes</option>
-<option value="90">90 minutes</option>
-<option value="150">150 minutes</option>
-</select>
-<p class="muted">These settings apply to the selected mock.</p>
-</article>
-
-<article class="card">
-<h2>Add a Mock Test</h2>
-<p>Import a new question bank without replacing your existing mocks.</p>
-<button onclick="showView('toolsView')">Add / Import Mock</button>
-</article>
-
-<article class="card">
-<h2>Backup & Restore</h2>
-<p>Save your mocks and attempt history before changing devices or clearing browser data.</p>
-<button onclick="exportAll()">Export Full Backup</button>
-<label for="backupInput">Restore backup file</label>
-<input id="backupInput" type="file" accept=".json,application/json">
-<button class="secondary" style="margin-top:8px;width:100%" onclick="restoreAll()">Restore Backup</button>
-<p id="backupStatus" class="muted"></p>
-</article>
-</div>
-
-<section class="panel">
-<h2>Your Mock Tests</h2>
-<p class="muted">Each mock keeps its own attempts and best score.</p>
-<div id="mockList" class="grid"></div>
-<p id="emptyMocks" class="muted hidden">No mock tests available.</p>
-</section>
-
-<section class="panel">
-<h2>Previous Attempt History</h2>
-<div id="attemptHistory"><p class="muted">Your completed attempts will appear here.</p></div>
-</section>
-
-<section class="panel">
-<h2>Subject-wise Performance</h2>
-<p class="muted">Subject accuracy is calculated from saved question-level responses.</p>
-<div id="subjectStats"><p class="muted">Complete tests with subject labels to build your analysis.</p></div>
-</section>
-
-<section class="panel">
-<h2>Questions to Revise</h2>
-<p class="muted">Questions you answer incorrectly will be collected here when detailed responses are available.</p>
-<div id="weakQuestions"><p class="muted">No revision data yet.</p></div>
-</section>
-</section>
-<section id="toolsView" class="hidden">
-  <div class="panel">
-    <h2>Add or Import Mock</h2>
-    <p class="muted">Create a mock manually or import questions from a JSON file.</p>
-
-    <label for="mockTitle">Mock test name</label>
-    <input id="mockTitle" type="text" placeholder="e.g. MVSI Automobile Mock 1">
-
-    <label for="mockSubject">Subject (optional)</label>
-    <input id="mockSubject" type="text" placeholder="e.g. Automobile Engineering">
-
-    <label for="mockJson">Import questions JSON</label>
-    <input id="mockJson" type="file" accept=".json,application/json">
-
-    <div class="actions">
-      <button onclick="importMock()">Import JSON Mock</button>
-      <button class="secondary" onclick="showView('homeView')">Back to Dashboard</button>
-    </div>
-
-    <div id="importStatus" class="notice hidden"></div>
-
-    <details>
-      <summary>JSON format example</summary>
-      <pre>{
-  "title": "Automobile Mock 1",
-  "questions": [
-    {
-      "question_en": "Which component transmits torque?",
-      "options": {
-        "A": "Clutch",
-        "B": "Radiator",
-        "C": "Air filter",
-        "D": "Battery"
-      },
-      "answer": "A",
-      "explanation_en": "The clutch transmits engine torque to the gearbox.",
-      "section": "Transmission"
-    }
-  ]
-}</pre>
-      <p class="muted">The import function in Part 3 will also support common alternative question and answer field names.</p>
-    </details>
-  </div>
-</section>
-
-<section id="testView" class="hidden">
-  <div class="panel">
-    <div class="testTop">
-      <div>
-        <h2 id="testTitle">Mock Test</h2>
-        <p id="testModeLabel" class="muted">Full Mock</p>
+  <section id="homeView">
+    <div class="panel">
+      <h2>Progress Dashboard</h2>
+      <p class="muted">Your mocks and attempts are saved in this browser. Export a backup before clearing browser data.</p>
+      <div class="statGrid">
+        <div class="statCard"><span>Available mocks</span><strong id="statMocks">0</strong></div>
+        <div class="statCard"><span>Total attempts</span><strong id="statAttempts">0</strong></div>
+        <div class="statCard"><span>Average score</span><strong id="statAverage">鈥�</strong></div>
+        <div class="statCard"><span>Questions to revise</span><strong id="statRevision">0</strong></div>
       </div>
-      <div class="timerBox">
-        <span class="muted">Time left</span>
-        <strong id="timer">00:00</strong>
+      <h3>Recent score trend</h3>
+      <canvas id="scoreChart" height="190" aria-label="Recent scores chart"></canvas>
+      <p id="chartMessage" class="muted small">Your chart appears after your first attempt.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Test settings</h2>
+      <div class="inlineRow">
+        <div>
+          <label class="fieldLabel" for="questionCount">Questions per full mock</label>
+          <select id="questionCount">
+            <option value="all">All questions</option>
+            <option value="25">25 questions</option>
+            <option value="50">50 questions</option>
+            <option value="100">100 questions</option>
+          </select>
+        </div>
+        <div>
+          <label class="fieldLabel" for="duration">Test duration</label>
+          <select id="duration">
+            <option value="0">No timer</option>
+            <option value="30">30 minutes</option>
+            <option value="60" selected>60 minutes</option>
+            <option value="90">90 minutes</option>
+            <option value="120">120 minutes</option>
+          </select>
+        </div>
       </div>
-    </div>
-
-    <div class="progressTrack">
-      <div id="testProgressBar" class="progressFill"></div>
-    </div>
-
-    <div class="testMeta">
-      <span id="questionPosition">Question 1 of 1</span>
-      <span id="answeredCount">Answered: 0</span>
-    </div>
-
-    <div id="questionPalette" class="questionPalette"></div>
-
-    <div class="questionCard">
-      <div class="questionNumber" id="questionNumber">QUESTION 1</div>
-      <h3 id="questionText">Question text</h3>
-      <div id="questionImage"></div>
-      <div id="optionList" class="optionList"></div>
-    </div>
-
-    <div class="actions between">
-      <button class="secondary" onclick="previousQuestion()">Previous</button>
-      <button class="secondary" onclick="clearResponse()">Clear Response</button>
-      <button onclick="nextQuestion()">Next</button>
-    </div>
-
-    <div class="actions">
-      <button class="danger" onclick="submitTest(false)">Submit Test</button>
-      <button class="secondary" onclick="confirmExitTest()">Exit Test</button>
-    </div>
-
-    <p class="muted small">
-      Your answers are recorded when you submit. Avoid refreshing the page during a test.
-    </p>
-  </div>
-</section>
-
-<section id="resultView" class="hidden">
-  <div class="panel">
-    <h2 id="resultTitle">Test Result</h2>
-    <p id="resultSubtitle" class="muted"></p>
-
-    <div class="resultGrid">
-      <div class="statCard">
-        <span class="muted">Score</span>
-        <strong id="resultScore">0%</strong>
+      <div class="actions">
+        <button type="button" onclick="showView('toolsView')">Add / Import Mock</button>
+        <button type="button" class="secondary" onclick="exportAll()">Export Full Backup</button>
       </div>
-      <div class="statCard">
-        <span class="muted">Correct</span>
-        <strong id="resultCorrect">0</strong>
-      </div>
-      <div class="statCard">
-        <span class="muted">Incorrect</span>
-        <strong id="resultWrong">0</strong>
-      </div>
-      <div class="statCard">
-        <span class="muted">Unanswered</span>
-        <strong id="resultSkipped">0</strong>
-      </div>
+      <label class="fieldLabel" for="backupInput">Restore backup JSON</label>
+      <input id="backupInput" type="file" accept=".json,application/json">
+      <div class="actions"><button class="secondary" type="button" onclick="restoreAll()">Restore Backup</button></div>
+      <p id="backupStatus" class="notice hidden" role="status"></p>
     </div>
 
-    <div class="actions">
-      <button id="retryIncorrectButton" onclick="retryIncorrect()">Retry Incorrect Questions</button>
-      <button class="secondary" onclick="reviewAttempt()">Review Answers</button>
-      <button class="secondary" onclick="showView('homeView')">Dashboard</button>
+    <div class="panel">
+      <h2>Your Mock Tests</h2>
+      <div id="mockList" class="grid"></div>
+      <p id="emptyMocks" class="muted">No mocks yet. Use 鈥淎dd / Import Mock鈥� to import your MVSI question bank.</p>
     </div>
 
-    <div id="resultMessage" class="notice"></div>
-    <div id="answerReview"></div>
-  </div>
-</section>
-
-<section id="reviewView" class="hidden">
-  <div class="panel">
-    <h2 id="reviewTitle">Answer Review</h2>
-    <p class="muted">Review your selected answers, correct answers, and explanations.</p>
-    <div id="reviewContent"></div>
-    <div class="actions">
-      <button onclick="retryIncorrect()">Retry Incorrect Questions</button>
-      <button class="secondary" onclick="showView('homeView')">Dashboard</button>
+    <div class="panel">
+      <h2>Attempt History</h2>
+      <div id="attemptHistory" class="muted">Your attempts will appear here.</div>
     </div>
-  </div>
-</section>
+    <div class="panel">
+      <h2>Subject-wise Progress</h2>
+      <div id="subjectStats" class="muted">Subject data will appear after you attempt questions.</div>
+    </div>
+    <div class="panel">
+      <h2>Questions for Revision</h2>
+      <p class="muted small">Incorrect or unanswered questions stay here until you answer them correctly in two consecutive attempts.</p>
+      <div id="weakQuestions" class="muted">Questions needing revision will appear here.</div>
+    </div>
+  </section>
+
+  <section id="toolsView" class="hidden">
+    <div class="panel">
+      <h2>Add or Import Mock</h2>
+      <p class="muted">Import your JSON question bank. The importer supports your uploaded format with <code>question_en</code>, <code>A_en</code>鈥�<code>D_en</code>, <code>correct</code>, <code>explanation_en</code> and <code>section</code>.</p>
+      <label class="fieldLabel" for="mockTitle">Mock test name (optional)</label>
+      <input id="mockTitle" type="text" placeholder="e.g. MVSI Paper III Practice Set">
+      <label class="fieldLabel" for="mockSubject">Subject (optional)</label>
+      <input id="mockSubject" type="text" placeholder="e.g. Automobile Engineering">
+      <label class="fieldLabel" for="mockJson">Import questions JSON</label>
+      <input id="mockJson" type="file" accept=".json,application/json">
+      <div class="actions">
+        <button type="button" onclick="importMock()">Import JSON Mock</button>
+        <button type="button" class="secondary" onclick="goHome()">Back to Dashboard</button>
+      </div>
+      <p id="importStatus" class="notice hidden" role="status"></p>
+      <details>
+        <summary>Supported JSON format example</summary>
+        <pre>[
+  {
+    "section": "Automobile Chassis and Drivetrain",
+    "question_en": "What is the primary function of a differential?",
+    "A_en": "Increase engine speed",
+    "B_en": "Allow drive wheels to rotate at different speeds",
+    "C_en": "Cool the gearbox",
+    "D_en": "Operate the brakes",
+    "correct": "B",
+    "explanation_en": "A differential allows the drive wheels to rotate at different speeds while cornering."
+  }
+]</pre>
+      </details>
+    </div>
+  </section>
+
+  <section id="testView" class="hidden">
+    <div class="panel">
+      <div class="testTop">
+        <div><h2 id="testTitle">Mock Test</h2><p id="testModeLabel" class="muted">Full mock</p></div>
+        <div class="timerBox"><span class="muted small">Time left</span><strong id="timer">60:00</strong></div>
+      </div>
+      <div class="progressTrack"><div id="testProgressBar" class="progressFill"></div></div>
+      <div class="testMeta"><span id="questionPosition">Question 1 of 1</span><span id="answeredCount">Answered: 0</span></div>
+      <div id="questionPalette" class="questionPalette" aria-label="Question navigation"></div>
+      <div class="questionCard">
+        <div id="questionNumber" class="questionNumber">QUESTION 1</div>
+        <h3 id="questionText">Question text</h3>
+        <div id="questionImage"></div>
+        <div id="optionList" class="optionList"></div>
+      </div>
+      <div class="actions between">
+        <button type="button" class="secondary" onclick="previousQuestion()">Previous</button>
+        <button type="button" class="secondary" onclick="clearResponse()">Clear Response</button>
+        <button type="button" onclick="nextQuestion()">Next</button>
+      </div>
+      <div class="actions">
+        <button type="button" class="danger" onclick="submitTest(false)">Submit Test</button>
+        <button type="button" class="secondary" onclick="confirmExitTest()">Exit Test</button>
+      </div>
+      <p class="muted small">Your answers are saved as an attempt only when you submit. Avoid refreshing the page during a test.</p>
+    </div>
+  </section>
+
+  <section id="resultView" class="hidden">
+    <div class="panel">
+      <h2 id="resultTitle">Test Result</h2>
+      <p id="resultSubtitle" class="muted"></p>
+      <div class="resultGrid">
+        <div class="statCard"><span>Score</span><strong id="resultScore">0%</strong></div>
+        <div class="statCard"><span>Correct</span><strong id="resultCorrect">0</strong></div>
+        <div class="statCard"><span>Incorrect</span><strong id="resultWrong">0</strong></div>
+        <div class="statCard"><span>Unanswered</span><strong id="resultSkipped">0</strong></div>
+      </div>
+      <div class="actions">
+        <button id="retryIncorrectButton" type="button" onclick="retryIncorrect()">Retry Incorrect Questions</button>
+        <button type="button" class="secondary" onclick="reviewAttempt()">Review Answers</button>
+        <button type="button" class="secondary" onclick="goHome()">Dashboard</button>
+      </div>
+      <p id="resultMessage" class="notice"></p>
+      <div id="answerReview"></div>
+    </div>
+  </section>
+
+  <section id="reviewView" class="hidden">
+    <div class="panel">
+      <h2 id="reviewTitle">Answer Review</h2>
+      <p class="muted">Review selected answers, correct answers, and explanations.</p>
+      <div id="reviewContent"></div>
+      <div class="actions"><button type="button" class="secondary" onclick="goHome()">Back to Dashboard</button></div>
+    </div>
+  </section>
+</main>
+<footer>Rajasthan MVSI Test Series 鈥� Progress is stored locally in this browser.</footer>
+
 <script>
 "use strict";
 
+// Keep the existing key so the app can reuse saved mocks from earlier versions.
 const STORAGE_KEY = "mvsiMockSeriesV3";
-
 let mocks = [];
 let activeMockId = null;
 let activeQuestions = [];
@@ -311,95 +264,75 @@ let currentIndex = 0;
 let remainingSeconds = 0;
 let timerInterval = null;
 let lastResult = null;
-let lastAttemptId = null;
-let isReviewing = false;
 
 function makeId() {
-  return "id_" + Date.now().toString(36) +
-    Math.random().toString(36).slice(2, 8);
+  return "id_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
 function escapeHtml(value) {
-  return String(value ?? "").replace(/[&<>"']/g, c => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;",
-    '"': "&quot;", "'": "&#39;"
-  })[c]);
+  return String(value ?? "").replace(/[&<>"']/g, function (ch) {
+    return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[ch];
+  });
 }
 
-function readStorage() {
-  try {
-    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    return Array.isArray(raw) ? raw :
-      Array.isArray(raw.mocks) ? raw.mocks : [];
-  } catch (e) {
-    return [];
-  }
-}
-
-function questionText(q) {
-  return q.question_en || q.question || q.questionText ||
-    q.text || q.question_hi || q.questionHindi || "Question";
+function getQuestionText(q) {
+  return q.question_en || q.question || q.questionText || q.question_text || q.text || q.question_hi || q.Question || "Question text missing";
 }
 
 function getOptions(q) {
-  let raw = q.options || q.choices || q.answers;
+  const raw = q.options || q.choices || q.answers;
   if (Array.isArray(raw)) {
-    const letters = ["A", "B", "C", "D", "E", "F"];
-    const out = {};
-    raw.forEach((v, i) => {
-      out[letters[i] || String(i + 1)] =
-        typeof v === "object" ? (v.text || v.value || "") : v;
+    const labels = ["A", "B", "C", "D", "E", "F"];
+    const options = {};
+    raw.forEach(function (item, i) {
+      options[labels[i] || String(i + 1)] = (item && typeof item === "object") ? (item.text || item.value || item.label || "") : item;
     });
-    return out;
+    return options;
   }
   if (raw && typeof raw === "object") return raw;
 
-  const out = {};
-  ["A", "B", "C", "D", "E", "F"].forEach(letter => {
-    const value = q[letter] ?? q["option" + letter] ??
-      q["option_" + letter] ?? q[letter.toLowerCase()];
-    if (value !== undefined && value !== null && value !== "") {
-      out[letter] = value;
+  // This is the exact field style used in the uploaded 150-question JSON file.
+  const options = {};
+  ["A", "B", "C", "D", "E", "F"].forEach(function (letter) {
+    const candidates = [letter + "_en", letter, letter.toLowerCase(), "option" + letter, "option_" + letter, "Option" + letter];
+    for (const key of candidates) {
+      if (q[key] !== undefined && q[key] !== null && String(q[key]).trim() !== "") {
+        options[letter] = q[key];
+        break;
+      }
     }
   });
-  return out;
+  return options;
 }
 
-function getAnswerRaw(q) {
-  return q.answer ?? q.correctAnswer ?? q.correct_answer ??
-    q.correctOption ?? q.correct_option ?? q.key ?? q.ans ?? "";
+function getRawAnswer(q) {
+  return q.correct ?? q.answer ?? q.correctAnswer ?? q.correct_answer ?? q.correctOption ?? q.correct_option ?? q.key ?? q.ans ?? q.answerKey ?? "";
 }
 
-function normaliseAnswer(q) {
-  const raw = getAnswerRaw(q);
+function getCorrectAnswer(q) {
+  const raw = getRawAnswer(q);
+  if (raw === null || raw === undefined || String(raw).trim() === "") return "";
+  const text = String(raw).trim();
   const options = getOptions(q);
-  const letters = Object.keys(options);
-  const value = String(raw).trim();
-  if (!value) return "";
-
-  const upper = value.toUpperCase();
-  if (Object.keys(options).some(k => k.toUpperCase() === upper)) {
-    return Object.keys(options).find(k => k.toUpperCase() === upper);
+  const labels = Object.keys(options);
+  const upper = text.toUpperCase();
+  const exactLabel = labels.find(function (label) { return label.toUpperCase() === upper; });
+  if (exactLabel) return exactLabel;
+  const matchLetter = upper.match(/^(?:OPTION\s*)?([A-F])(?:\b|[).])?$/);
+  if (matchLetter && labels.includes(matchLetter[1])) return matchLetter[1];
+  if (/^\d+$/.test(text)) {
+    const n = Number(text);
+    if (n >= 1 && n <= labels.length) return labels[n - 1];
   }
-
-  const numeric = Number(value);
-  if (/^\d+$/.test(value) && numeric >= 1 && numeric <= letters.length) {
-    return letters[numeric - 1];
-  }
-
-  const matched = letters.find(k =>
-    String(options[k]).trim().toLowerCase() === value.toLowerCase()
-  );
-  return matched || "";
+  const matchingText = labels.find(function (label) {
+    return String(options[label]).trim().toLowerCase() === text.toLowerCase();
+  });
+  return matchingText || "";
 }
 
-function stableQuestionKey(q) {
-  const source = [
-    questionText(q),
-    JSON.stringify(getOptions(q)),
-    normaliseAnswer(q)
-  ].join("|").toLowerCase().replace(/\s+/g, " ").trim();
-
+function questionKey(q) {
+  if (q.key) return String(q.key);
+  const source = [getQuestionText(q), JSON.stringify(getOptions(q)), getCorrectAnswer(q)].join("|").toLowerCase().replace(/\s+/g, " ").trim();
   let hash = 2166136261;
   for (let i = 0; i < source.length; i++) {
     hash ^= source.charCodeAt(i);
@@ -408,56 +341,82 @@ function stableQuestionKey(q) {
   return "q_" + (hash >>> 0).toString(36);
 }
 
-function normaliseQuestion(q) {
-  const question = { ...q };
-  question.key = question.key || stableQuestionKey(question);
-  question.section = question.section || question.subject ||
-    question.topic || "General";
-  question.explanation_en = question.explanation_en ||
-    question.explanation || question.solution || "";
-  return question;
+function normalizeQuestion(original) {
+  const q = Object.assign({}, original);
+  q.question_en = getQuestionText(q);
+  q.options = getOptions(q);
+  q.answer = getCorrectAnswer(q);
+  q.section = q.section || q.subject || q.topic || q.category || "General";
+  q.explanation_en = q.explanation_en || q.explanation || q.solution || q.rationale || "";
+  q.option_analysis_en = q.option_analysis_en || q.optionAnalysis || "";
+  q.exam_tip_en = q.exam_tip_en || q.examTip || "";
+  q.key = questionKey(q);
+  return q;
 }
 
-function normaliseMock(m) {
-  m.id = m.id || makeId();
-  m.title = m.title || m.name || "Untitled Mock";
-  m.subject = m.subject || "General";
-  m.questions = Array.isArray(m.questions)
-    ? m.questions.map(normaliseQuestion) : [];
-  m.attempts = Array.isArray(m.attempts) ? m.attempts : [];
-  m.mistakes = Array.isArray(m.mistakes) ? m.mistakes : [];
-  return m;
+function normalizeMock(original) {
+  const mock = Object.assign({}, original);
+  mock.id = mock.id || makeId();
+  mock.title = mock.title || mock.name || "Untitled Mock";
+  mock.subject = mock.subject || "General";
+  mock.questions = Array.isArray(mock.questions) ? mock.questions.map(normalizeQuestion) : [];
+  mock.attempts = Array.isArray(mock.attempts) ? mock.attempts : [];
+  mock.mistakes = Array.isArray(mock.mistakes) ? mock.mistakes : [];
+  return mock;
+}
+
+function loadStoredMocks() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    const list = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.mocks) ? raw.mocks : []);
+    return list.map(normalizeMock);
+  } catch (err) {
+    console.error("Could not read saved mocks", err);
+    return [];
+  }
 }
 
 function saveAll() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(mocks));
     return true;
-  } catch (e) {
-    alert("Could not save data. Your browser storage may be full. Export a backup and try again.");
+  } catch (err) {
+    alert("Your browser could not save the data. Export a backup and check that browser storage is available.");
     return false;
   }
 }
 
-function getMock(id) {
-  return mocks.find(m => m.id === id);
+function getMock(mockId) {
+  return mocks.find(function (mock) { return mock.id === mockId; });
 }
 
-function showView(id) {
-  document.querySelectorAll("main section").forEach(section => {
-    section.classList.add("hidden");
-  });
-  const target = document.getElementById(id);
+function showView(viewId) {
+  document.querySelectorAll("main section").forEach(function (section) { section.classList.add("hidden"); });
+  const target = document.getElementById(viewId);
   if (target) target.classList.remove("hidden");
-  if (id === "homeView") renderDashboard();
+  if (viewId === "homeView") renderDashboard();
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-function showNotice(id, message, isError = false) {
+function goHome() {
+  const testIsOpen = !document.getElementById("testView").classList.contains("hidden");
+  if (testIsOpen && activeMockId) {
+    if (!confirm("Exit this test? Your current unsubmitted answers will not be saved.")) return;
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+    activeMockId = null;
+    activeQuestions = [];
+    activeAnswers = {};
+  }
+  showView("homeView");
+}
+
+function showNotice(id, message, isError) {
   const el = document.getElementById(id);
   if (!el) return;
   el.textContent = message;
-  el.classList.remove("hidden");
-  el.style.color = isError ? "#b42318" : "";
+  el.classList.remove("hidden", "error");
+  if (isError) el.classList.add("error");
 }
 
 function importMock() {
@@ -465,279 +424,232 @@ function importMock() {
   const titleInput = document.getElementById("mockTitle");
   const subjectInput = document.getElementById("mockSubject");
   const file = fileInput.files && fileInput.files[0];
-
   if (!file) {
-    showNotice("importStatus", "Please select a JSON file first.", true);
+    showNotice("importStatus", "Please choose a JSON file first.", true);
     return;
   }
 
   const reader = new FileReader();
-  reader.onload = () => {
+  reader.onload = function () {
     try {
       const parsed = JSON.parse(reader.result);
-      const list = Array.isArray(parsed)
-        ? parsed
-        : Array.isArray(parsed.questions) ? parsed.questions
-        : Array.isArray(parsed.data) ? parsed.data
-        : Array.isArray(parsed.items) ? parsed.items : null;
-
-      if (!list || !list.length) {
-        throw new Error("No questions array found in this JSON file.");
+      let list;
+      if (Array.isArray(parsed)) {
+        list = parsed;
+      } else if (parsed && typeof parsed === "object") {
+        list = parsed.questions || parsed.mcqs || parsed.items || parsed.data || parsed.results || parsed.questionBank || parsed.question_bank;
+        if (!Array.isArray(list) && list && typeof list === "object") {
+          list = list.questions || list.mcqs || list.items || list.data;
+        }
+      }
+      if (!Array.isArray(list) || list.length === 0) {
+        throw new Error("No questions array found. The file must contain a JSON array of questions or an object with a questions array.");
       }
 
-      const questions = list.map(normaliseQuestion);
-      const valid = questions.filter(q =>
-        questionText(q) !== "Question" &&
-        Object.keys(getOptions(q)).length >= 2
-      );
-
+      const normalized = list.map(function (item) { return normalizeQuestion(item || {}); });
+      const valid = normalized.filter(function (q) {
+        const text = getQuestionText(q);
+        return text && text !== "Question text missing" && Object.keys(q.options || {}).length >= 2;
+      });
       if (!valid.length) {
-        throw new Error("No usable questions found. Check the question and option fields.");
+        const keys = list[0] && typeof list[0] === "object" ? Object.keys(list[0]).join(", ") : "unknown";
+        throw new Error("Question fields were not recognised. Fields in the first item: " + keys);
       }
 
-      const mock = normaliseMock({
+      const mock = normalizeMock({
         id: makeId(),
-        title: titleInput.value.trim() ||
-          parsed.title || parsed.name || file.name.replace(/\.json$/i, ""),
-        subject: subjectInput.value.trim() ||
-          parsed.subject || "General",
+        title: titleInput.value.trim() || (parsed && parsed.title) || (parsed && parsed.name) || file.name.replace(/\.json$/i, ""),
+        subject: subjectInput.value.trim() || (parsed && parsed.subject) || "Mixed / General",
         questions: valid,
         attempts: [],
         mistakes: []
       });
-
       mocks.push(mock);
-      saveAll();
+      if (!saveAll()) {
+        mocks = mocks.filter(function (m) { return m.id !== mock.id; });
+        return;
+      }
       titleInput.value = "";
       subjectInput.value = "";
       fileInput.value = "";
-      showNotice("importStatus",
-        `Imported "${mock.title}" with ${valid.length} questions.`);
+      showNotice("importStatus", "Successfully imported " + valid.length + " of " + list.length + " questions from " + file.name + ".");
       renderDashboard();
-    } catch (e) {
-      showNotice("importStatus",
-        "Import failed: " + e.message, true);
+    } catch (err) {
+      showNotice("importStatus", "Import failed: " + err.message, true);
     }
   };
-  reader.onerror = () => showNotice("importStatus", "Could not read the selected file.", true);
+  reader.onerror = function () { showNotice("importStatus", "The selected file could not be read.", true); };
   reader.readAsText(file);
 }
 
 function getMistake(mock, key) {
-  return mock.mistakes.find(item => item.key === key);
+  return mock.mistakes.find(function (item) { return item.key === key; });
 }
 
-function getIncorrectQuestions(mock) {
-  return mock.mistakes.filter(item => !item.mastered);
+function getOpenMistakes(mock) {
+  return mock.mistakes.filter(function (item) { return !item.mastered; });
 }
 
-function startMock(mockId, mode = "full") {
+function startMock(mockId, mode) {
   const mock = getMock(mockId);
   if (!mock) return;
-
+  mode = mode || "full";
   let questions = mock.questions.slice();
 
   if (mode === "incorrect") {
-    const mistakes = getIncorrectQuestions(mock);
-    const keys = new Set(mistakes.map(item => item.key));
-    questions = questions.filter(q => keys.has(q.key));
-
+    const keys = new Set(getOpenMistakes(mock).map(function (item) { return item.key; }));
+    questions = questions.filter(function (q) { return keys.has(q.key); });
     if (!questions.length) {
-      alert("There are no unmastered incorrect questions for this mock yet. Attempt a full mock first.");
+      alert("There are no incorrect questions waiting for revision in this mock. Attempt the full mock first.");
       return;
     }
+  } else {
+    const countValue = document.getElementById("questionCount").value;
+    if (countValue !== "all") questions = questions.slice(0, Number(countValue));
   }
 
   activeMockId = mockId;
   activeMode = mode;
-  activeQuestions = questions.map(normaliseQuestion);
+  activeQuestions = questions.map(normalizeQuestion);
   activeAnswers = {};
   currentIndex = 0;
   lastResult = null;
-  isReviewing = false;
 
-  const countSelect = document.getElementById("questionCount");
-  const durationSelect = document.getElementById("duration");
-
-  if (mode === "full") {
-    const count = countSelect ? Number(countSelect.value) : 0;
-    if (count > 0) activeQuestions = activeQuestions.slice(0, count);
-  }
-
-  const durationMinutes = durationSelect ? Number(durationSelect.value) : 0;
-  remainingSeconds = durationMinutes > 0
-    ? durationMinutes * 60
-    : Math.max(1, activeQuestions.length) * 60;
-
+  const minutes = Number(document.getElementById("duration").value || 0);
+  remainingSeconds = minutes > 0 ? minutes * 60 : 0;
   document.getElementById("testTitle").textContent = mock.title;
-  document.getElementById("testModeLabel").textContent =
-    mode === "incorrect"
-      ? "Retry Incorrect Questions"
-      : "Full Mock Test";
-
+  document.getElementById("testModeLabel").textContent = mode === "incorrect" ? "Retry Incorrect Questions" : "Full Mock Test";
   showView("testView");
   renderQuestion();
   updateTimerDisplay();
   clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    remainingSeconds--;
-    updateTimerDisplay();
-    if (remainingSeconds <= 0) {
-      clearInterval(timerInterval);
-      submitTest(true);
-    }
-  }, 1000);
+  timerInterval = null;
+  if (remainingSeconds > 0) {
+    timerInterval = setInterval(function () {
+      remainingSeconds -= 1;
+      updateTimerDisplay();
+      if (remainingSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        submitTest(true);
+      }
+    }, 1000);
+  }
 }
 
 function updateTimerDisplay() {
   const el = document.getElementById("timer");
   if (!el) return;
-  const seconds = Math.max(0, remainingSeconds);
-  const minutes = Math.floor(seconds / 60);
-  const remainder = seconds % 60;
-  el.textContent = String(minutes).padStart(2, "0") + ":" +
-    String(remainder).padStart(2, "0");
+  if (remainingSeconds <= 0) {
+    el.textContent = "No timer";
+    return;
+  }
+  const minutes = Math.floor(remainingSeconds / 60);
+  const seconds = remainingSeconds % 60;
+  el.textContent = String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
 }
 
 function renderQuestion() {
   const q = activeQuestions[currentIndex];
   if (!q) return;
-
-  document.getElementById("questionNumber").textContent =
-    "QUESTION " + (currentIndex + 1);
-  document.getElementById("questionText").textContent = questionText(q);
-  document.getElementById("questionPosition").textContent =
-    `Question ${currentIndex + 1} of ${activeQuestions.length}`;
-
-  const answered = Object.keys(activeAnswers).filter(key =>
-    activeAnswers[key] !== ""
-  ).length;
-  document.getElementById("answeredCount").textContent =
-    `Answered: ${answered}`;
-
-  const bar = document.getElementById("testProgressBar");
-  bar.style.width = (100 * (currentIndex + 1) /
-    Math.max(1, activeQuestions.length)) + "%";
+  document.getElementById("questionNumber").textContent = "QUESTION " + (currentIndex + 1);
+  document.getElementById("questionText").textContent = getQuestionText(q);
+  document.getElementById("questionPosition").textContent = "Question " + (currentIndex + 1) + " of " + activeQuestions.length;
+  const answered = Object.keys(activeAnswers).filter(function (key) { return Boolean(activeAnswers[key]); }).length;
+  document.getElementById("answeredCount").textContent = "Answered: " + answered;
+  document.getElementById("testProgressBar").style.width = ((currentIndex + 1) / Math.max(1, activeQuestions.length) * 100) + "%";
 
   const imageBox = document.getElementById("questionImage");
+  imageBox.replaceChildren();
   const imageUrl = q.image || q.image_url || q.imageUrl;
-  imageBox.innerHTML = "";
   if (imageUrl && /^https?:\/\//i.test(String(imageUrl))) {
     const img = document.createElement("img");
-    img.src = imageUrl;
+    img.src = String(imageUrl);
     img.alt = "Question illustration";
     img.style.maxWidth = "100%";
     img.style.maxHeight = "260px";
     imageBox.appendChild(img);
   }
 
-  const options = getOptions(q);
   const optionList = document.getElementById("optionList");
-  optionList.innerHTML = "";
-
-  Object.keys(options).forEach(letter => {
+  optionList.replaceChildren();
+  const options = q.options || getOptions(q);
+  Object.keys(options).forEach(function (letter) {
     const label = document.createElement("label");
-    label.className = "option";
-    if (activeAnswers[q.key] === letter) label.classList.add("selected");
-
+    label.className = "option" + (activeAnswers[q.key] === letter ? " selected" : "");
     const radio = document.createElement("input");
     radio.type = "radio";
     radio.name = "currentAnswer";
     radio.value = letter;
     radio.checked = activeAnswers[q.key] === letter;
-    radio.addEventListener("change", () => {
+    radio.addEventListener("change", function () {
       activeAnswers[q.key] = letter;
       renderQuestion();
     });
-
     const text = document.createElement("span");
-    text.textContent = `${letter}. ${options[letter]}`;
-
-    label.appendChild(radio);
-    label.appendChild(text);
+    text.textContent = letter + ". " + options[letter];
+    label.append(radio, text);
     optionList.appendChild(label);
   });
 
   const palette = document.getElementById("questionPalette");
-  palette.innerHTML = "";
-  activeQuestions.forEach((question, i) => {
+  palette.replaceChildren();
+  activeQuestions.forEach(function (question, i) {
     const button = document.createElement("button");
     button.type = "button";
-    button.textContent = String(i + 1);
     button.className = "paletteButton";
     if (activeAnswers[question.key]) button.classList.add("answered");
     if (i === currentIndex) button.classList.add("current");
-    button.addEventListener("click", () => {
-      currentIndex = i;
-      renderQuestion();
-    });
+    button.textContent = String(i + 1);
+    button.setAttribute("aria-label", "Go to question " + (i + 1));
+    button.addEventListener("click", function () { currentIndex = i; renderQuestion(); });
     palette.appendChild(button);
   });
 }
 
 function previousQuestion() {
-  if (currentIndex > 0) {
-    currentIndex--;
-    renderQuestion();
-  }
+  if (currentIndex > 0) { currentIndex -= 1; renderQuestion(); }
 }
-
 function nextQuestion() {
-  if (currentIndex < activeQuestions.length - 1) {
-    currentIndex++;
-    renderQuestion();
-  }
+  if (currentIndex < activeQuestions.length - 1) { currentIndex += 1; renderQuestion(); }
 }
-
 function clearResponse() {
   const q = activeQuestions[currentIndex];
   if (!q) return;
   delete activeAnswers[q.key];
   renderQuestion();
 }
+function confirmExitTest() { goHome(); }
 
-function confirmExitTest() {
-  if (confirm("Exit this test? Your current answers will not be saved as an attempt.")) {
-    clearInterval(timerInterval);
-    showView("homeView");
-  }
-}
-
-function submitTest(timeExpired = false) {
+function submitTest(timeExpired) {
   if (!activeMockId || !activeQuestions.length) return;
-  if (!timeExpired &&
-      !confirm("Submit this test and save your answers?")) return;
+  if (!timeExpired && !confirm("Submit this test and save your answers?")) return;
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
 
-  clearInterval(timerInterval);
   const mock = getMock(activeMockId);
   if (!mock) return;
-
   let correct = 0;
   let wrong = 0;
   let skipped = 0;
-
-  const answers = activeQuestions.map(q => {
-    const options = getOptions(q);
+  const answers = activeQuestions.map(function (q) {
     const selected = activeAnswers[q.key] || "";
-    const correctAnswer = normaliseAnswer(q);
-    const isCorrect = Boolean(selected && correctAnswer &&
-      selected === correctAnswer);
-
-    if (!selected) skipped++;
-    else if (isCorrect) correct++;
-    else wrong++;
-
+    const correctAnswer = getCorrectAnswer(q);
+    const isCorrect = Boolean(selected && correctAnswer && selected === correctAnswer);
+    if (!selected) skipped += 1;
+    else if (isCorrect) correct += 1;
+    else wrong += 1;
     return {
       questionKey: q.key,
-      question_en: questionText(q),
+      question_en: getQuestionText(q),
       section: q.section || mock.subject || "General",
-      options,
-      selected,
-      correctAnswer,
-      explanation_en: q.explanation_en || q.explanation || "",
-      option_analysis_en: q.option_analysis_en || q.optionAnalysis || "",
-      exam_tip_en: q.exam_tip_en || q.examTip || "",
-      isCorrect
+      options: q.options || getOptions(q),
+      selected: selected,
+      correctAnswer: correctAnswer,
+      explanation_en: q.explanation_en || "",
+      option_analysis_en: q.option_analysis_en || "",
+      exam_tip_en: q.exam_tip_en || "",
+      isCorrect: isCorrect
     };
   });
 
@@ -747,18 +659,16 @@ function submitTest(timeExpired = false) {
     date: new Date().toISOString(),
     mode: activeMode,
     score: total ? Math.round(correct * 100 / total) : 0,
-    correct,
-    wrong,
-    skipped,
-    total,
-    answers
+    correct: correct,
+    wrong: wrong,
+    skipped: skipped,
+    total: total,
+    answers: answers
   };
-
   mock.attempts.push(attempt);
 
-  answers.forEach(answer => {
+  answers.forEach(function (answer) {
     let mistake = getMistake(mock, answer.questionKey);
-
     if (!answer.isCorrect) {
       if (!mistake) {
         mistake = {
@@ -797,184 +707,126 @@ function submitTest(timeExpired = false) {
 
   saveAll();
   lastResult = { mockId: mock.id, attemptId: attempt.id };
-  lastAttemptId = attempt.id;
-
-  document.getElementById("resultTitle").textContent =
-    activeMode === "incorrect" ? "Retry Result" : "Mock Test Result";
-  document.getElementById("resultSubtitle").textContent =
-    `${mock.title} • ${new Date(attempt.date).toLocaleString()}`;
+  document.getElementById("resultTitle").textContent = activeMode === "incorrect" ? "Retry Result" : "Mock Test Result";
+  document.getElementById("resultSubtitle").textContent = mock.title + " 鈥� " + new Date(attempt.date).toLocaleString();
   document.getElementById("resultScore").textContent = attempt.score + "%";
-  document.getElementById("resultCorrect").textContent = correct;
-  document.getElementById("resultWrong").textContent = wrong;
-  document.getElementById("resultSkipped").textContent = skipped;
-
-  const remaining = getIncorrectQuestions(mock).length;
-  document.getElementById("resultMessage").textContent =
-    timeExpired
-      ? `Time expired. ${remaining} question(s) remain in your incorrect-question revision list.`
-      : `Attempt saved. ${remaining} question(s) remain in your incorrect-question revision list.`;
-
+  document.getElementById("resultCorrect").textContent = String(correct);
+  document.getElementById("resultWrong").textContent = String(wrong);
+  document.getElementById("resultSkipped").textContent = String(skipped);
+  const openCount = getOpenMistakes(mock).length;
+  document.getElementById("resultMessage").textContent = (timeExpired ? "Time expired. " : "Attempt saved. ") + openCount + " question(s) remain in your revision list. A question is marked mastered after two consecutive correct answers.";
   const retryButton = document.getElementById("retryIncorrectButton");
-  retryButton.disabled = remaining === 0;
-  retryButton.textContent = remaining
-    ? `Retry Incorrect Questions (${remaining})`
-    : "No Incorrect Questions to Retry";
-
-  renderAnswerReview(attempt);
+  retryButton.disabled = openCount === 0;
+  retryButton.textContent = openCount ? "Retry Incorrect Questions (" + openCount + ")" : "No Incorrect Questions to Retry";
+  renderAnswerReview(attempt, "answerReview");
   showView("resultView");
 }
 
-function renderAnswerReview(attempt) {
-  const container = document.getElementById("answerReview");
+function renderAnswerReview(attempt, containerId) {
+  const container = document.getElementById(containerId);
   if (!container) return;
-  container.innerHTML = "<h3>Quick Review</h3>";
-
-  attempt.answers.forEach((a, index) => {
+  container.replaceChildren();
+  const heading = document.createElement("h3");
+  heading.textContent = "Quick Answer Review";
+  container.appendChild(heading);
+  (attempt.answers || []).forEach(function (answer, index) {
     const card = document.createElement("div");
     card.className = "reviewCard";
-
-    const status = !a.selected ? "Unanswered" :
-      a.isCorrect ? "Correct" : "Incorrect";
-
-    const heading = document.createElement("h4");
-    heading.textContent = `${index + 1}. ${a.question_en}`;
-    card.appendChild(heading);
-
-    const statusLine = document.createElement("p");
-    statusLine.textContent = status;
-    statusLine.className = a.isCorrect ? "correctText" :
-      a.selected ? "wrongText" : "muted";
-    card.appendChild(statusLine);
-
-    const options = a.options || {};
-    Object.keys(options).forEach(letter => {
+    const title = document.createElement("h4");
+    title.textContent = (index + 1) + ". " + answer.question_en;
+    card.appendChild(title);
+    const status = document.createElement("p");
+    status.className = answer.isCorrect ? "correctText" : (answer.selected ? "wrongText" : "muted");
+    status.textContent = !answer.selected ? "Unanswered" : (answer.isCorrect ? "Correct" : "Incorrect");
+    card.appendChild(status);
+    Object.keys(answer.options || {}).forEach(function (letter) {
       const line = document.createElement("p");
-      line.textContent = `${letter}. ${options[letter]}` +
-        (letter === a.correctAnswer ? " — Correct answer" : "") +
-        (letter === a.selected ? " — Your answer" : "");
+      let label = letter + ". " + answer.options[letter];
+      if (letter === answer.correctAnswer) label += " 鈥� Correct answer";
+      if (letter === answer.selected) label += " 鈥� Your answer";
+      line.textContent = label;
       card.appendChild(line);
     });
-
-    if (a.explanation_en) {
-      const explanation = document.createElement("p");
-      explanation.textContent = "Explanation: " + a.explanation_en;
-      card.appendChild(explanation);
+    if (answer.explanation_en) {
+      const p = document.createElement("p");
+      p.textContent = "Explanation: " + answer.explanation_en;
+      card.appendChild(p);
     }
-    if (a.option_analysis_en) {
-      const analysis = document.createElement("p");
-      analysis.textContent = "Option analysis: " + a.option_analysis_en;
-      card.appendChild(analysis);
+    if (answer.option_analysis_en) {
+      const p = document.createElement("p");
+      p.textContent = "Option analysis: " + answer.option_analysis_en;
+      card.appendChild(p);
     }
-    if (a.exam_tip_en) {
-      const tip = document.createElement("p");
-      tip.textContent = "Exam tip: " + a.exam_tip_en;
-      card.appendChild(tip);
+    if (answer.exam_tip_en) {
+      const p = document.createElement("p");
+      p.textContent = "Exam tip: " + answer.exam_tip_en;
+      card.appendChild(p);
     }
-
     container.appendChild(card);
   });
 }
 
 function retryIncorrect() {
-  if (!lastResult) {
-    alert("Submit a test first to build your incorrect-question list.");
-    return;
-  }
+  if (!lastResult) { alert("Submit a test first to build your incorrect-question list."); return; }
   startMock(lastResult.mockId, "incorrect");
 }
 
 function reviewAttempt() {
   if (!lastResult) return;
   const mock = getMock(lastResult.mockId);
-  const attempt = mock && mock.attempts.find(a => a.id === lastResult.attemptId);
+  const attempt = mock && mock.attempts.find(function (item) { return item.id === lastResult.attemptId; });
   if (!attempt) return;
-
-  document.getElementById("reviewTitle").textContent =
-    `${mock.title} — Attempt Review`;
+  document.getElementById("reviewTitle").textContent = mock.title + " 鈥� Attempt Review";
   const container = document.getElementById("reviewContent");
-  container.innerHTML = "";
-
   if (!Array.isArray(attempt.answers)) {
-    container.textContent =
-      "This older attempt only contains a total score. Question-level answers were not saved, so a detailed review is unavailable.";
+    container.textContent = "This older attempt saved only the overall score, so question-level answers are not available for review.";
   } else {
-    attempt.answers.forEach((a, index) => {
-      const card = document.createElement("div");
-      card.className = "reviewCard";
-
-      const title = document.createElement("h4");
-      title.textContent = `${index + 1}. ${a.question_en || "Question"}`;
-      card.appendChild(title);
-
-      const status = document.createElement("p");
-      status.textContent = !a.selected ? "Unanswered" :
-        a.isCorrect ? "Correct" : "Incorrect";
-      card.appendChild(status);
-
-      Object.keys(a.options || {}).forEach(letter => {
-        const p = document.createElement("p");
-        p.textContent = `${letter}. ${a.options[letter]}` +
-          (letter === a.correctAnswer ? " — Correct answer" : "") +
-          (letter === a.selected ? " — Your answer" : "");
-        card.appendChild(p);
-      });
-
-      if (a.explanation_en) {
-        const p = document.createElement("p");
-        p.textContent = "Explanation: " + a.explanation_en;
-        card.appendChild(p);
-      }
-      container.appendChild(card);
-    });
+    renderAnswerReview(attempt, "reviewContent");
   }
   showView("reviewView");
 }
 
-function exportAll() {
-  const data = {
-    app: "MVSI Mock Series",
-    version: 4,
-    exportedAt: new Date().toISOString(),
-    mocks
-  };
-  downloadText(
-    JSON.stringify(data, null, 2),
-    "mvsi-mock-series-backup.json",
-    "application/json"
-  );
-}
-
-function restoreAll() {
-  const input = document.getElementById("backupInput");
-  const file = input.files && input.files[0];
-  if (!file) {
-    showNotice("backupStatus", "Select a backup JSON file first.", true);
-    return;
+function reviewMockHistory(mockId) {
+  const mock = getMock(mockId);
+  if (!mock) return;
+  document.getElementById("reviewTitle").textContent = mock.title + " 鈥� Attempt History";
+  const container = document.getElementById("reviewContent");
+  container.replaceChildren();
+  const history = (mock.attempts || []).slice().reverse();
+  if (!history.length) {
+    container.textContent = "No attempts recorded for this mock yet.";
   }
-
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const parsed = JSON.parse(reader.result);
-      const list = Array.isArray(parsed) ? parsed : parsed.mocks;
-      if (!Array.isArray(list)) throw new Error("Backup does not contain a mocks list.");
-
-      if (!confirm("Restore this backup? This will replace the mocks currently saved in this browser.")) return;
-
-      mocks = list.map(normaliseMock);
-      saveAll();
-      input.value = "";
-      showNotice("backupStatus", `Restored ${mocks.length} mock(s).`);
-      renderDashboard();
-    } catch (e) {
-      showNotice("backupStatus", "Restore failed: " + e.message, true);
+  history.forEach(function (attempt, index) {
+    const card = document.createElement("div");
+    card.className = "reviewCard";
+    const title = document.createElement("h4");
+    title.textContent = "Attempt " + (history.length - index) + " 鈥� " + (attempt.score ?? 0) + "%";
+    card.appendChild(title);
+    const p = document.createElement("p");
+    p.textContent = new Date(attempt.date).toLocaleString() + " 鈥� Correct: " + (attempt.correct ?? "鈥�") + " 鈥� Wrong: " + (attempt.wrong ?? "鈥�") + " 鈥� Total: " + (attempt.total ?? "鈥�");
+    card.appendChild(p);
+    if (Array.isArray(attempt.answers)) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = "Review this attempt";
+      button.addEventListener("click", function () {
+        lastResult = { mockId: mock.id, attemptId: attempt.id };
+        reviewAttempt();
+      });
+      card.appendChild(button);
+    } else {
+      const note = document.createElement("p");
+      note.className = "muted small";
+      note.textContent = "Detailed answers were not saved in this older attempt.";
+      card.appendChild(note);
     }
-  };
-  reader.readAsText(file);
+    container.appendChild(card);
+  });
+  showView("reviewView");
 }
 
-function downloadText(content, filename, mime) {
-  const blob = new Blob([content], { type: mime });
+function downloadFile(content, filename, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
@@ -982,337 +834,265 @@ function downloadText(content, filename, mime) {
   document.body.appendChild(link);
   link.click();
   link.remove();
-  URL.revokeObjectURL(url);
+  setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+}
+
+function exportAll() {
+  const data = { app: "Rajasthan MVSI Test Series", version: 4, exportedAt: new Date().toISOString(), mocks: mocks };
+  downloadFile(JSON.stringify(data, null, 2), "mvsi-mock-series-backup.json", "application/json");
 }
 
 function exportMock(mockId) {
   const mock = getMock(mockId);
   if (!mock) return;
-  downloadText(JSON.stringify(mock, null, 2),
-    mock.title.replace(/[^a-z0-9_-]+/gi, "_") + ".json",
-    "application/json");
+  const filename = mock.title.replace(/[^a-z0-9_-]+/gi, "_") + ".json";
+  downloadFile(JSON.stringify(mock, null, 2), filename, "application/json");
+}
+
+function restoreAll() {
+  const input = document.getElementById("backupInput");
+  const file = input.files && input.files[0];
+  if (!file) { showNotice("backupStatus", "Please select a backup JSON file first.", true); return; }
+  const reader = new FileReader();
+  reader.onload = function () {
+    try {
+      const parsed = JSON.parse(reader.result);
+      const list = Array.isArray(parsed) ? parsed : parsed.mocks;
+      if (!Array.isArray(list)) throw new Error("This file does not contain a mocks list.");
+      if (!confirm("Restore this backup? This will replace the mocks currently saved in this browser.")) return;
+      mocks = list.map(normalizeMock);
+      if (!saveAll()) return;
+      input.value = "";
+      showNotice("backupStatus", "Restored " + mocks.length + " mock(s) successfully.");
+      renderDashboard();
+    } catch (err) {
+      showNotice("backupStatus", "Restore failed: " + err.message, true);
+    }
+  };
+  reader.onerror = function () { showNotice("backupStatus", "The backup file could not be read.", true); };
+  reader.readAsText(file);
 }
 
 function deleteMock(mockId) {
   const mock = getMock(mockId);
   if (!mock) return;
-  if (!confirm(`Delete "${mock.title}" and its saved attempts? Export a backup first if needed.`)) return;
-  mocks = mocks.filter(m => m.id !== mockId);
+  if (!confirm('Delete "' + mock.title + '" and its saved attempts? Export a backup first if needed.')) return;
+  mocks = mocks.filter(function (item) { return item.id !== mockId; });
   saveAll();
   renderDashboard();
 }
 
-function reviewMockHistory(mockId) {
-  const mock = getMock(mockId);
-  if (!mock) return;
-
-  const history = mock.attempts.slice().reverse();
-  const container = document.getElementById("reviewContent");
-  document.getElementById("reviewTitle").textContent =
-    `${mock.title} — Attempt History`;
-  container.innerHTML = "";
-
-  if (!history.length) {
-    container.textContent = "No attempts recorded for this mock yet.";
-  }
-
-  history.forEach((attempt, index) => {
-    const card = document.createElement("div");
-    card.className = "reviewCard";
-
-    const heading = document.createElement("h4");
-    heading.textContent =
-      `Attempt ${history.length - index} — ${attempt.score ?? 0}%`;
-    card.appendChild(heading);
-
-    const detail = document.createElement("p");
-    detail.textContent =
-      `${new Date(attempt.date).toLocaleString()} • ` +
-      `Correct: ${attempt.correct ?? "—"} • ` +
-      `Wrong: ${attempt.wrong ?? "—"} • ` +
-      `Total: ${attempt.total ?? "—"}`;
-    card.appendChild(detail);
-
-    if (Array.isArray(attempt.answers)) {
-      const reviewButton = document.createElement("button");
-      reviewButton.textContent = "Review this attempt";
-      reviewButton.addEventListener("click", () => {
-        lastResult = { mockId: mock.id, attemptId: attempt.id };
-        lastAttemptId = attempt.id;
-        reviewAttempt();
-      });
-      card.appendChild(reviewButton);
-    } else {
-      const note = document.createElement("p");
-      note.className = "muted";
-      note.textContent = "Detailed answers are not available for this older attempt.";
-      card.appendChild(note);
-    }
-    container.appendChild(card);
-  });
-
-  showView("reviewView");
-}
-
 function renderDashboard() {
+  const allAttempts = [];
+  let pendingRevision = 0;
+  mocks.forEach(function (mock) {
+    (mock.attempts || []).forEach(function (attempt) { allAttempts.push(Object.assign({ mockTitle: mock.title, mockId: mock.id }, attempt)); });
+    pendingRevision += getOpenMistakes(mock).length;
+  });
+  document.getElementById("statMocks").textContent = String(mocks.length);
+  document.getElementById("statAttempts").textContent = String(allAttempts.length);
+  document.getElementById("statRevision").textContent = String(pendingRevision);
+  const average = allAttempts.length ? Math.round(allAttempts.reduce(function (sum, a) { return sum + Number(a.score || 0); }, 0) / allAttempts.length) : null;
+  document.getElementById("statAverage").textContent = average === null ? "鈥�" : average + "%";
+
   const list = document.getElementById("mockList");
-  if (!list) return;
-  list.innerHTML = "";
-
-  const empty = document.getElementById("emptyMocks");
-  if (empty) empty.classList.toggle("hidden", mocks.length > 0);
-
-  mocks.forEach(mock => {
-    const attempts = mock.attempts || [];
-    const latest = attempts.length ? attempts[attempts.length - 1] : null;
-    const openMistakes = getIncorrectQuestions(mock).length;
-
+  list.replaceChildren();
+  document.getElementById("emptyMocks").classList.toggle("hidden", mocks.length > 0);
+  mocks.forEach(function (mock) {
     const card = document.createElement("div");
     card.className = "mockCard";
-
     const title = document.createElement("h3");
     title.textContent = mock.title;
     card.appendChild(title);
-
-    const subtitle = document.createElement("p");
-    subtitle.className = "muted";
-    subtitle.textContent =
-      `${mock.subject || "General"} • ${mock.questions.length} questions`;
-    card.appendChild(subtitle);
-
-    const stats = document.createElement("p");
-    stats.textContent =
-      `Attempts: ${attempts.length} • Latest score: ` +
-      `${latest ? (latest.score ?? 0) + "%" : "Not attempted"} • ` +
-      `Questions to revise: ${openMistakes}`;
-    card.appendChild(stats);
-
+    const subject = document.createElement("p");
+    subject.className = "muted small";
+    subject.textContent = (mock.subject || "General") + " 鈥� " + mock.questions.length + " questions";
+    card.appendChild(subject);
+    const latest = (mock.attempts || []).length ? mock.attempts[mock.attempts.length - 1] : null;
+    const details = document.createElement("p");
+    details.textContent = "Attempts: " + (mock.attempts || []).length + " 鈥� Latest score: " + (latest ? (latest.score ?? 0) + "%" : "Not attempted") + " 鈥� To revise: " + getOpenMistakes(mock).length;
+    card.appendChild(details);
     const actions = document.createElement("div");
     actions.className = "actions";
-
     const start = document.createElement("button");
-    start.textContent = "Start Full Mock";
-    start.addEventListener("click", () => startMock(mock.id, "full"));
+    start.type = "button"; start.textContent = "Start Full Mock";
+    start.addEventListener("click", function () { startMock(mock.id, "full"); });
     actions.appendChild(start);
-
     const retry = document.createElement("button");
-    retry.className = "secondary";
-    retry.textContent = `Retry Incorrect (${openMistakes})`;
-    retry.disabled = openMistakes === 0;
-    retry.addEventListener("click", () => startMock(mock.id, "incorrect"));
+    retry.type = "button"; retry.className = "secondary"; retry.textContent = "Retry Incorrect (" + getOpenMistakes(mock).length + ")";
+    retry.disabled = getOpenMistakes(mock).length === 0;
+    retry.addEventListener("click", function () { startMock(mock.id, "incorrect"); });
     actions.appendChild(retry);
-
     const history = document.createElement("button");
-    history.className = "secondary";
-    history.textContent = "Attempt History";
-    history.addEventListener("click", () => reviewMockHistory(mock.id));
+    history.type = "button"; history.className = "secondary"; history.textContent = "Attempt History";
+    history.addEventListener("click", function () { reviewMockHistory(mock.id); });
     actions.appendChild(history);
-
     const exportButton = document.createElement("button");
-    exportButton.className = "secondary";
-    exportButton.textContent = "Export Mock";
-    exportButton.addEventListener("click", () => exportMock(mock.id));
+    exportButton.type = "button"; exportButton.className = "secondary"; exportButton.textContent = "Export Mock";
+    exportButton.addEventListener("click", function () { exportMock(mock.id); });
     actions.appendChild(exportButton);
-
     const remove = document.createElement("button");
-    remove.className = "danger";
-    remove.textContent = "Delete";
-    remove.addEventListener("click", () => deleteMock(mock.id));
+    remove.type = "button"; remove.className = "danger"; remove.textContent = "Delete Mock";
+    remove.addEventListener("click", function () { deleteMock(mock.id); });
     actions.appendChild(remove);
-
     card.appendChild(actions);
     list.appendChild(card);
   });
 
-  renderProgress();
+  renderAttemptHistory(allAttempts);
+  renderSubjectStats();
+  renderWeakQuestions();
+  drawScoreChart(allAttempts);
 }
 
-function renderProgress() {
-  const allAttempts = [];
-  let questionTotal = 0;
-  let totalMistakes = 0;
+function renderAttemptHistory(attempts) {
+  const box = document.getElementById("attemptHistory");
+  box.replaceChildren();
+  if (!attempts.length) {
+    box.textContent = "Your attempts will appear here after your first test.";
+    box.className = "muted";
+    return;
+  }
+  box.className = "";
+  attempts.slice().sort(function (a, b) { return new Date(b.date) - new Date(a.date); }).slice(0, 10).forEach(function (attempt) {
+    const card = document.createElement("div");
+    card.className = "reviewCard";
+    const text = document.createElement("p");
+    text.textContent = new Date(attempt.date).toLocaleString() + " 鈥� " + attempt.mockTitle + ": " + (attempt.score ?? 0) + "% (" + (attempt.correct ?? 0) + "/" + (attempt.total ?? 0) + ")";
+    card.appendChild(text);
+    const button = document.createElement("button");
+    button.type = "button"; button.className = "secondary"; button.textContent = "Review attempt";
+    button.addEventListener("click", function () {
+      lastResult = { mockId: attempt.mockId, attemptId: attempt.id };
+      reviewAttempt();
+    });
+    card.appendChild(button);
+    box.appendChild(card);
+  });
+}
 
-  mocks.forEach(mock => {
-    questionTotal += mock.questions.length;
-    totalMistakes += getIncorrectQuestions(mock).length;
-    (mock.attempts || []).forEach(attempt => {
-      allAttempts.push({ ...attempt, mockTitle: mock.title });
+function renderSubjectStats() {
+  const box = document.getElementById("subjectStats");
+  box.replaceChildren();
+  const subjects = {};
+  mocks.forEach(function (mock) {
+    (mock.attempts || []).forEach(function (attempt) {
+      (attempt.answers || []).forEach(function (answer) {
+        const name = answer.section || mock.subject || "General";
+        if (!subjects[name]) subjects[name] = { answered: 0, correct: 0 };
+        if (answer.selected) subjects[name].answered += 1;
+        if (answer.isCorrect) subjects[name].correct += 1;
+      });
     });
   });
-
-  const history = document.getElementById("attemptHistory");
-  if (history) {
-    history.innerHTML = "";
-    const recent = allAttempts.slice().sort((a, b) =>
-      new Date(b.date) - new Date(a.date)).slice(0, 10);
-
-    if (!recent.length) {
-      history.textContent = "Your attempt history will appear here after your first test.";
-    } else {
-      recent.forEach(attempt => {
-        const p = document.createElement("p");
-        p.textContent =
-          `${new Date(attempt.date).toLocaleDateString()} — ` +
-          `${attempt.mockTitle}: ${attempt.score ?? 0}% ` +
-          `(${attempt.correct ?? 0}/${attempt.total ?? 0})`;
-        history.appendChild(p);
-      });
-    }
+  const entries = Object.entries(subjects).filter(function (entry) { return entry[1].answered > 0; }).sort(function (a, b) {
+    return (a[1].correct / a[1].answered) - (b[1].correct / b[1].answered);
+  });
+  if (!entries.length) {
+    box.className = "muted";
+    box.textContent = "Subject-wise statistics will appear after you submit a test.";
+    return;
   }
+  box.className = "";
+  entries.forEach(function (entry) {
+    const name = entry[0], data = entry[1];
+    const p = document.createElement("p");
+    p.textContent = name + ": " + Math.round(data.correct * 100 / data.answered) + "% correct on answered questions (" + data.correct + "/" + data.answered + ")";
+    box.appendChild(p);
+  });
+}
 
-  const subjectBox = document.getElementById("subjectStats");
-  if (subjectBox) {
-    subjectBox.innerHTML = "";
-    const subjects = {};
-
-    mocks.forEach(mock => {
-      mock.questions.forEach(q => {
-        const subject = q.section || mock.subject || "General";
-        if (!subjects[subject]) subjects[subject] = { total: 0, correct: 0 };
-        subjects[subject].total++;
-      });
-      mock.attempts.forEach(attempt => {
-        (attempt.answers || []).forEach(answer => {
-          const subject = answer.section || mock.subject || "General";
-          if (!subjects[subject]) subjects[subject] = { total: 0, correct: 0 };
-          if (answer.isCorrect) subjects[subject].correct++;
-        });
-      });
-    });
-
-    const entries = Object.entries(subjects);
-    if (!entries.length) {
-      subjectBox.textContent = "Subject-wise progress will appear after you add questions.";
-    } else {
-      entries.forEach(([name, data]) => {
-        const p = document.createElement("p");
-        const accuracy = data.total
-          ? Math.round(data.correct * 100 / data.total) : 0;
-        p.textContent = `${name}: ${accuracy}% recorded correct answers`;
-        subjectBox.appendChild(p);
-      });
-    }
+function renderWeakQuestions() {
+  const box = document.getElementById("weakQuestions");
+  box.replaceChildren();
+  const weak = [];
+  mocks.forEach(function (mock) {
+    getOpenMistakes(mock).forEach(function (mistake) { weak.push({ mock: mock, mistake: mistake }); });
+  });
+  weak.sort(function (a, b) { return (b.mistake.wrongCount || 0) - (a.mistake.wrongCount || 0); });
+  if (!weak.length) {
+    box.className = "muted";
+    box.textContent = "No pending incorrect questions. Attempt a mock to identify what needs revision.";
+    return;
   }
-
-  const weakBox = document.getElementById("weakQuestions");
-  if (weakBox) {
-    weakBox.innerHTML = "";
-    const weak = [];
-
-    mocks.forEach(mock => {
-      mock.mistakes.filter(item => !item.mastered).forEach(item => {
-        weak.push({ ...item, mockId: mock.id, mockTitle: mock.title });
-      });
-    });
-
-    if (!weak.length) {
-      weakBox.textContent =
-        "No pending incorrect questions. Attempt a mock to identify topics for revision.";
-    } else {
-      weak.sort((a, b) => (b.wrongCount || 0) - (a.wrongCount || 0));
-      weak.slice(0, 15).forEach(item => {
-        const card = document.createElement("div");
-        card.className = "reviewCard";
-
-        const title = document.createElement("p");
-        title.textContent = item.question_en;
-        card.appendChild(title);
-
-        const detail = document.createElement("p");
-        detail.className = "muted";
-        detail.textContent =
-          `${item.mockTitle} • ${item.section} • Wrong ${item.wrongCount || 0} time(s)`;
-        card.appendChild(detail);
-
-        const button = document.createElement("button");
-        button.textContent = "Retry this mock's incorrect questions";
-        button.addEventListener("click", () => startMock(item.mockId, "incorrect"));
-        card.appendChild(button);
-
-        weakBox.appendChild(card);
-      });
-    }
-  }
-
-  drawScoreChart(allAttempts);
+  box.className = "";
+  weak.slice(0, 15).forEach(function (item) {
+    const card = document.createElement("div");
+    card.className = "reviewCard";
+    const title = document.createElement("h4");
+    title.textContent = item.mistake.question_en || "Question for revision";
+    card.appendChild(title);
+    const detail = document.createElement("p");
+    detail.className = "muted small";
+    detail.textContent = item.mock.title + " 鈥� " + (item.mistake.section || "General") + " 鈥� Incorrect/unanswered: " + (item.mistake.wrongCount || 0) + " time(s)";
+    card.appendChild(detail);
+    const button = document.createElement("button");
+    button.type = "button"; button.textContent = "Retry this mock's incorrect questions";
+    button.addEventListener("click", function () { startMock(item.mock.id, "incorrect"); });
+    card.appendChild(button);
+    box.appendChild(card);
+  });
 }
 
 function drawScoreChart(attempts) {
   const canvas = document.getElementById("scoreChart");
   const message = document.getElementById("chartMessage");
   if (!canvas) return;
-
-  const ctx = canvas.getContext("2d");
-  const width = canvas.clientWidth || 500;
+  const width = Math.max(260, canvas.clientWidth || 500);
   const height = 190;
   const ratio = window.devicePixelRatio || 1;
-
   canvas.width = width * ratio;
   canvas.height = height * ratio;
   canvas.style.width = "100%";
   canvas.style.height = height + "px";
-  ctx.scale(ratio, ratio);
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
   ctx.clearRect(0, 0, width, height);
-
-  const recent = attempts.slice().sort((a, b) =>
-    new Date(a.date) - new Date(b.date)).slice(-10);
-
+  const recent = attempts.slice().sort(function (a, b) { return new Date(a.date) - new Date(b.date); }).slice(-10);
   if (!recent.length) {
-    if (message) message.textContent = "Your score chart will appear after your first attempt.";
+    message.textContent = "Your chart appears after your first attempt.";
     return;
   }
-  if (message) message.textContent = "Your 10 most recent recorded attempts.";
-
-  const left = 34, right = 10, top = 12, bottom = 30;
+  message.textContent = "Your 10 most recent recorded attempts, oldest to newest.";
+  const left = 38, right = 10, top = 12, bottom = 28;
   const chartWidth = width - left - right;
   const chartHeight = height - top - bottom;
-
-  ctx.font = "11px sans-serif";
-  ctx.textAlign = "right";
-  ctx.fillStyle = "#64748b";
-
-  [0, 50, 100].forEach(value => {
+  ctx.font = "11px system-ui, sans-serif";
+  [0, 50, 100].forEach(function (value) {
     const y = top + chartHeight * (1 - value / 100);
-    ctx.beginPath();
-    ctx.moveTo(left, y);
-    ctx.lineTo(width - right, y);
-    ctx.strokeStyle = "#dbe2ea";
-    ctx.stroke();
-    ctx.fillText(value + "%", left - 5, y + 4);
+    ctx.beginPath(); ctx.moveTo(left, y); ctx.lineTo(width - right, y);
+    ctx.strokeStyle = "#d7e0e7"; ctx.stroke();
+    ctx.fillStyle = "#657487"; ctx.textAlign = "right"; ctx.fillText(value + "%", left - 5, y + 4);
   });
-
   const step = chartWidth / recent.length;
-  const barWidth = Math.min(24, step * 0.55);
-
-  recent.forEach((attempt, i) => {
+  const barWidth = Math.min(25, step * 0.58);
+  recent.forEach(function (attempt, index) {
     const score = Math.max(0, Math.min(100, Number(attempt.score) || 0));
     const barHeight = chartHeight * score / 100;
-    const x = left + step * i + (step - barWidth) / 2;
+    const x = left + step * index + (step - barWidth) / 2;
     const y = top + chartHeight - barHeight;
-
-    ctx.fillStyle = "#2563eb";
+    ctx.fillStyle = "#285d7d";
     ctx.fillRect(x, y, barWidth, barHeight);
-
-    ctx.fillStyle = "#475569";
-    ctx.textAlign = "center";
-    ctx.fillText(String(i + 1), x + barWidth / 2, height - 10);
+    ctx.fillStyle = "#475569"; ctx.textAlign = "center";
+    ctx.fillText(String(index + 1), x + barWidth / 2, height - 9);
   });
 }
 
-function migrateAndStart() {
-  mocks = readStorage().map(normaliseMock);
+window.addEventListener("resize", function () {
+  const attempts = [];
+  mocks.forEach(function (mock) { (mock.attempts || []).forEach(function (attempt) { attempts.push(Object.assign({ mockTitle: mock.title, mockId: mock.id }, attempt)); }); });
+  drawScoreChart(attempts);
+});
+
+function initApp() {
+  mocks = loadStoredMocks();
+  // Only normalise existing records and preserve their attempts/mistakes.
   saveAll();
   renderDashboard();
   showView("homeView");
 }
 
-window.addEventListener("resize", () => {
-  const attempts = [];
-  mocks.forEach(mock => mock.attempts.forEach(attempt => attempts.push(attempt)));
-  drawScoreChart(attempts);
-});
-
-migrateAndStart();
+initApp();
 </script>
 </body>
 </html>
